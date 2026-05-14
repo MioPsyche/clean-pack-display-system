@@ -69,7 +69,7 @@ export function InquiryForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5">
+    <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
       <div className="grid gap-4 sm:grid-cols-2">
         <Input
           label="联系人"
@@ -122,7 +122,7 @@ export function InquiryForm() {
         提交询价意向
       </Button>
       {submitted ? (
-        <p className="rounded-2xl bg-aqua/10 px-4 py-3 text-sm font-semibold text-carbon">
+        <p className="rounded-2xl border border-aqua/15 bg-aqua/10 px-4 py-3 text-sm font-semibold text-carbon">
           询价记录已保存到 localStorage，本地后台可查看。
         </p>
       ) : null}

@@ -11,8 +11,8 @@ export function TechSpecsSection() {
       description="未完成实验验证的指标不填写虚假数值，统一保留“待实测”或 TODO。"
       className="bg-[linear-gradient(135deg,#071516_0%,#10201F_55%,#0A2A28_100%)]"
     >
-      <div className="overflow-hidden rounded-[2rem] border border-white/10 bg-white/8">
-        <div className="grid grid-cols-[1fr_1fr_1.2fr] gap-0 border-b border-white/10 bg-white/10 px-5 py-4 text-xs font-semibold uppercase tracking-[0.2em] text-mint max-sm:hidden">
+      <div className="overflow-hidden rounded-[1.6rem] border border-white/10 bg-white/[0.07] shadow-[0_26px_80px_rgba(0,0,0,0.22)] backdrop-blur sm:rounded-[2rem]">
+        <div className="hidden grid-cols-[1fr_1fr_1.2fr] gap-0 border-b border-white/10 bg-white/10 px-5 py-4 text-xs font-semibold uppercase tracking-[0.2em] text-mint sm:grid">
           <span>参数项</span>
           <span>当前值</span>
           <span>说明</span>
@@ -21,11 +21,26 @@ export function TechSpecsSection() {
           {techSpecs.map((spec) => (
             <div
               key={spec.name}
-              className="grid gap-3 px-5 py-5 text-sm text-white/82 sm:grid-cols-[1fr_1fr_1.2fr]"
+              className="grid gap-3 px-4 py-5 text-sm text-white/82 sm:grid-cols-[1fr_1fr_1.2fr] sm:px-5"
             >
-              <span className="font-semibold text-white">{spec.name}</span>
-              <span>{spec.value}</span>
-              <span className="text-white/62">{spec.note}</span>
+              <span className="font-semibold text-white">
+                <span className="mb-1 block text-[0.68rem] font-bold uppercase tracking-[0.18em] text-mint/70 sm:hidden">
+                  参数项
+                </span>
+                {spec.name}
+              </span>
+              <span>
+                <span className="mb-1 block text-[0.68rem] font-bold uppercase tracking-[0.18em] text-mint/70 sm:hidden">
+                  当前值
+                </span>
+                {spec.value}
+              </span>
+              <span className="text-white/62">
+                <span className="mb-1 block text-[0.68rem] font-bold uppercase tracking-[0.18em] text-mint/70 sm:hidden">
+                  说明
+                </span>
+                {spec.note}
+              </span>
             </div>
           ))}
         </div>

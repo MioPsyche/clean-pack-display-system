@@ -25,7 +25,7 @@ export function SectionShell({
     <section
       id={id}
       className={cn(
-        'relative overflow-hidden px-5 py-24 sm:px-8 sm:py-28 lg:px-10 lg:py-32',
+        'relative overflow-hidden px-4 py-20 sm:px-8 sm:py-24 lg:px-10 lg:py-28 xl:py-32',
         dark ? 'bg-carbon text-white' : 'bg-transparent text-carbon',
         className,
       )}

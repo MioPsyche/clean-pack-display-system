@@ -67,7 +67,7 @@ export function DemoBookingForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5">
+    <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
       <div className="grid gap-4 sm:grid-cols-2">
         <Input
           label="联系人"
@@ -113,7 +113,7 @@ export function DemoBookingForm() {
         提交预约演示
       </Button>
       {submitted ? (
-        <p className="rounded-2xl bg-leaf/15 px-4 py-3 text-sm font-semibold text-carbon">
+        <p className="rounded-2xl border border-leaf/20 bg-leaf/15 px-4 py-3 text-sm font-semibold text-carbon">
           已写入本地模拟后台，可前往 /admin 查看。
         </p>
       ) : null}

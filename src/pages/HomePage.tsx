@@ -14,9 +14,9 @@ import { TechSpecsSection } from '../sections/home/TechSpecsSection';
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-mist text-carbon">
+    <div className="min-h-screen overflow-x-hidden bg-[linear-gradient(180deg,#F6FBF9_0%,#EEF7F4_40%,#F8FBFC_100%)] text-carbon">
       <SiteHeader />
-      <main>
+      <main className="overflow-x-hidden">
         <HeroSection />
         <PainPointSection />
         <SolutionSection />
