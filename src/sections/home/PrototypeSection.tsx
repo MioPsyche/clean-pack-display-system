@@ -4,6 +4,7 @@ import { Card } from '../../components/ui/Card';
 export function PrototypeSection() {
   return (
     <SectionShell
+      id="prototype"
       dark
       eyebrow="Prototype"
       title="物理样机与工程验证展示"

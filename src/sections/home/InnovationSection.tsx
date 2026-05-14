@@ -6,6 +6,7 @@ import { Card } from '../../components/ui/Card';
 export function InnovationSection() {
   return (
     <SectionShell
+      id="innovation"
       eyebrow="Innovation"
       title="核心创新点围绕工程落地与展示闭环"
       description="创新点不只描述机械结构，也包含展示系统、参数规范和比赛演示流程的完整性。"
@@ -15,7 +16,7 @@ export function InnovationSection() {
           <Card
             key={item.title}
             elevated
-            className="relative overflow-hidden transition-[transform,border-color,box-shadow] duration-300 hover:-translate-y-1 hover:border-aqua/20"
+            className="relative overflow-hidden transition-[background-color,border-color,box-shadow] duration-300 hover:border-aqua/25 hover:bg-white hover:shadow-panel"
           >
             <div className="absolute right-0 top-0 h-28 w-28 rounded-bl-[3rem] bg-[linear-gradient(135deg,rgba(15,163,161,0.14),rgba(232,248,245,0.8))]" />
             <Badge tone="leaf">{item.tag}</Badge>

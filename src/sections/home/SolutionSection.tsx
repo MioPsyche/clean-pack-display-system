@@ -5,6 +5,7 @@ import { Card } from '../../components/ui/Card';
 export function SolutionSection() {
   return (
     <SectionShell
+      id="solution"
       dark
       eyebrow="Solution"
       title="以模块化流程组织设备方案"
@@ -17,7 +18,7 @@ export function SolutionSection() {
           {solutionTimeline.map((item) => (
             <Card
               key={item.phase}
-              className="group relative bg-none border-white/15 bg-white/[0.065] text-white shadow-[0_22px_70px_rgba(0,0,0,0.22)] ring-1 ring-white/10 transition-[transform,background-color,border-color] duration-300 hover:-translate-y-1 hover:border-mint/25 hover:bg-white/[0.095]"
+              className="group relative bg-none border-white/15 bg-white/[0.065] text-white shadow-[0_22px_70px_rgba(0,0,0,0.22)] ring-1 ring-white/10 transition-[background-color,border-color,box-shadow] duration-300 hover:border-mint/25 hover:bg-white/[0.095] hover:shadow-[0_26px_76px_rgba(0,0,0,0.28)]"
             >
               <div className="flex items-start justify-between gap-4">
                 <span className="font-display text-4xl font-semibold tracking-[-0.05em] text-mint">

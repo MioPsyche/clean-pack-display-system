@@ -5,7 +5,7 @@ import { Card } from '../../components/ui/Card';
 export function PainPointSection() {
   return (
     <SectionShell
-      id="solution"
+      id="background"
       eyebrow="Problem"
       title="从叶菜采后处理痛点出发"
       description="本项目面向比赛展示和样机验证，不夸大商业化指标，重点表达流程连续化、洁净化和小型场景适配价值。"
@@ -15,7 +15,7 @@ export function PainPointSection() {
           <Card
             key={point.title}
             elevated
-            className="group relative overflow-hidden transition-[transform,box-shadow,border-color] duration-300 hover:-translate-y-1 hover:border-aqua/20"
+            className="group relative overflow-hidden transition-[background-color,border-color,box-shadow] duration-300 hover:border-aqua/25 hover:bg-white hover:shadow-panel"
           >
             <span className="absolute right-5 top-5 font-display text-5xl font-semibold tracking-[-0.06em] text-carbon/[0.04]">
               {String(index + 1).padStart(2, '0')}

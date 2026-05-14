@@ -12,7 +12,7 @@ export function HeroSection() {
   return (
     <section
       id="overview"
-      className="relative isolate overflow-hidden bg-[linear-gradient(135deg,#F8FBFC_0%,#EEF7F4_46%,#FFFFFF_100%)] px-4 pb-20 pt-16 sm:px-8 sm:pt-20 lg:px-10 lg:pb-28 lg:pt-24"
+      className="relative isolate scroll-mt-24 overflow-hidden bg-[linear-gradient(135deg,#F8FBFC_0%,#EEF7F4_46%,#FFFFFF_100%)] px-4 pb-20 pt-16 sm:px-8 sm:pt-20 lg:px-10 lg:pb-28 lg:pt-24"
     >
       <div className="absolute inset-0 bg-industrial-grid bg-[length:64px_64px] opacity-55" />
       <div className="absolute -left-28 top-20 h-80 w-80 rounded-full bg-mint/24 blur-3xl" />
