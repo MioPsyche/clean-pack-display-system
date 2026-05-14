@@ -1,0 +1,13 @@
+<svg width="960" height="620" viewBox="0 0 960 620" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="960" height="620" rx="36" fill="#F4FBF9"/>
+  <path d="M140 480H820" stroke="#B7D4CE" stroke-width="4" stroke-linecap="round"/>
+  <rect x="170" y="330" width="170" height="90" rx="14" fill="#DFF5EF" stroke="#0FA3A1" stroke-width="3"/>
+  <rect x="395" y="260" width="200" height="100" rx="18" fill="#E8F8F5" stroke="#0FA3A1" stroke-width="3"/>
+  <rect x="650" y="190" width="145" height="92" rx="16" fill="#DDFBEA" stroke="#78B92D" stroke-width="3"/>
+  <path d="M340 375L395 312M595 310L650 236" stroke="#6B7B7A" stroke-width="2" stroke-dasharray="8 10"/>
+  <circle cx="230" cy="455" r="28" fill="#0FA3A1"/>
+  <circle cx="515" cy="395" r="28" fill="#0FA3A1"/>
+  <circle cx="725" cy="318" r="28" fill="#A3E635"/>
+  <text x="480" y="88" fill="#10201F" font-size="34" text-anchor="middle" font-family="Arial, sans-serif">SolidWorks 爆炸图占位</text>
+  <text x="480" y="132" fill="#6B7B7A" font-size="20" text-anchor="middle" font-family="Arial, sans-serif">后续替换真实装配体结构图</text>
+</svg>

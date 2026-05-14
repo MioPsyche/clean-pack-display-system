@@ -1,0 +1,15 @@
+<svg width="960" height="640" viewBox="0 0 960 640" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="960" height="640" rx="40" fill="#071516"/>
+  <path d="M120 470H820" stroke="#163B39" stroke-width="6" stroke-linecap="round"/>
+  <rect x="170" y="270" width="250" height="120" rx="22" fill="#10201F" stroke="#67E8C9" stroke-width="3"/>
+  <rect x="465" y="225" width="300" height="165" rx="26" fill="#0C2A29" stroke="#0FA3A1" stroke-width="3"/>
+  <path d="M240 270L300 185H380L420 270" stroke="#A3E635" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M520 225L580 150H705L765 225" stroke="#67E8C9" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="235" cy="420" r="32" fill="#0FA3A1"/>
+  <circle cx="355" cy="420" r="32" fill="#0FA3A1"/>
+  <circle cx="545" cy="420" r="32" fill="#67E8C9"/>
+  <circle cx="695" cy="420" r="32" fill="#67E8C9"/>
+  <path d="M210 315H380M510 285H720M510 325H700" stroke="#E8F8F5" stroke-width="4" stroke-linecap="round" opacity="0.72"/>
+  <path d="M128 154C260 82 410 76 578 132C684 168 770 153 835 109" stroke="#67E8C9" stroke-width="2" stroke-dasharray="10 14" opacity="0.55"/>
+  <text x="480" y="545" fill="#E8F8F5" font-size="30" text-anchor="middle" font-family="Arial, sans-serif">设备主视觉占位图</text>
+</svg>
