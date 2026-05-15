@@ -44,7 +44,7 @@ export function AchievementSection() {
             className="bg-none min-h-44 border-white/15 bg-white/[0.065] text-white shadow-[0_22px_70px_rgba(0,0,0,0.2)] ring-1 ring-white/10 transition-[background-color,border-color,box-shadow] duration-300 hover:border-mint/25 hover:bg-white/[0.095] hover:shadow-[0_26px_76px_rgba(0,0,0,0.26)]"
           >
             <p className="text-xs font-bold uppercase tracking-[0.2em] text-mint">{achievement.type}</p>
-            <h3 className="mt-5 font-display text-xl font-semibold leading-snug tracking-[-0.03em] text-white">
+            <h3 className="mt-5 break-words font-display text-xl font-semibold leading-snug tracking-[-0.03em] text-white">
               {achievement.title}
             </h3>
             <p className="mt-5 w-fit rounded-full border border-white/10 bg-white/10 px-3 py-1 text-xs font-semibold text-white/78">

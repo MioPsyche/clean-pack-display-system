@@ -18,10 +18,14 @@ export function ProjectDataPanel() {
   return (
     <Card elevated className="bg-white">
       <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
-        <div>
+        <div className="min-w-0">
           <p className="text-sm font-semibold text-aqua">Project Data Overview</p>
-          <h2 className="mt-2 font-display text-2xl font-semibold text-carbon">{projectProfile.name}</h2>
-          <p className="mt-3 max-w-3xl text-sm leading-7 text-steel">{projectProfile.description}</p>
+          <h2 className="mt-2 break-words font-display text-2xl font-semibold text-carbon">
+            {projectProfile.name}
+          </h2>
+          <p className="mt-3 max-w-3xl break-words text-sm leading-7 text-steel">
+            {projectProfile.description}
+          </p>
         </div>
         <span className="w-fit rounded-full bg-carbon px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-white">
           local demo

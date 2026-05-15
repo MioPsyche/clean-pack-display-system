@@ -23,13 +23,13 @@ export function HeroSection() {
       <div className="relative mx-auto grid max-w-[1400px] items-center gap-14 lg:grid-cols-[0.88fr_1.12fr]">
         <div className="max-w-3xl">
           <Badge className="bg-white/[0.7]">Engineering Showcase</Badge>
-          <h1 className="mt-6 max-w-4xl font-display text-[2.55rem] font-semibold leading-[1.03] tracking-[-0.06em] text-carbon text-balance sm:text-6xl lg:text-7xl">
+          <h1 className="mt-6 max-w-4xl break-words font-display text-[2.55rem] font-semibold leading-[1.03] tracking-[-0.06em] text-carbon text-balance sm:text-6xl lg:text-7xl">
             {projectProfile.shortName}
           </h1>
-          <p className="mt-6 max-w-2xl text-base leading-8 text-graphite/82 sm:text-xl">
+          <p className="mt-6 max-w-2xl break-words text-base leading-8 text-graphite/82 sm:text-xl">
             {projectProfile.subtitle}
           </p>
-          <p className="mt-5 max-w-2xl text-sm leading-7 text-steel sm:text-base">
+          <p className="mt-5 max-w-2xl break-words text-sm leading-7 text-steel sm:text-base">
             {projectProfile.description}
           </p>
 

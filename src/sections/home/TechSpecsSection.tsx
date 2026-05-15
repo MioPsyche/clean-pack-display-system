@@ -29,13 +29,13 @@ export function TechSpecsSection() {
                 </span>
                 {spec.name}
               </span>
-              <span>
+              <span className="break-words">
                 <span className="mb-1 block text-[0.68rem] font-bold uppercase tracking-[0.18em] text-mint/70 sm:hidden">
                   当前值
                 </span>
                 {spec.value}
               </span>
-              <span className="text-white/62">
+              <span className="break-words text-white/62">
                 <span className="mb-1 block text-[0.68rem] font-bold uppercase tracking-[0.18em] text-mint/70 sm:hidden">
                   说明
                 </span>

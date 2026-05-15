@@ -39,15 +39,15 @@ export function TeamSection() {
           {teamMembers.map((member) => (
             <Card key={`${member.role}-${member.name}`} className="bg-white">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                <div>
+                <div className="min-w-0">
                   <h3 className="font-display text-xl font-semibold text-carbon">{member.name}</h3>
-                  <p className="mt-1 text-sm font-semibold text-aqua">{member.role}</p>
+                  <p className="mt-1 break-words text-sm font-semibold text-aqua">{member.role}</p>
                 </div>
                 <span className="w-fit rounded-full bg-mist px-3 py-1 text-xs font-semibold text-carbon">
                   项目成员
                 </span>
               </div>
-              <p className="mt-4 text-sm leading-7 text-steel">{member.responsibility}</p>
+              <p className="mt-4 break-words text-sm leading-7 text-steel">{member.responsibility}</p>
             </Card>
           ))}
         </div>
