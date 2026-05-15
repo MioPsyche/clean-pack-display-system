@@ -13,6 +13,7 @@ dist-ssr/
 doc-source/
 docs-source/
 source-data/
+copyright-docs/
 
 # Logs
 logs/
