@@ -5,6 +5,7 @@ import { Card } from '../ui/Card';
 type AdminStatCardsProps = {
   bookings: DemoBookingRecord[];
   inquiries: InquiryRecord[];
+  sourceLabel?: string;
 };
 
 function formatLatestDate(records: Array<{ createdAt: string }>) {
@@ -23,7 +24,7 @@ function formatLatestDate(records: Array<{ createdAt: string }>) {
 
 const numberFormatter = new Intl.NumberFormat('zh-CN');
 
-export function AdminStatCards({ bookings, inquiries }: AdminStatCardsProps) {
+export function AdminStatCards({ bookings, inquiries, sourceLabel = '当前浏览器本地记录' }: AdminStatCardsProps) {
   const allRecords = [...bookings, ...inquiries].sort(
     (left, right) => new Date(right.createdAt).getTime() - new Date(left.createdAt).getTime(),
   );
@@ -50,7 +51,7 @@ export function AdminStatCards({ bookings, inquiries }: AdminStatCardsProps) {
             <span className={`mt-1 h-3 w-3 rounded-full ${stat.tone}`} aria-hidden="true" />
           </div>
           <p className="relative mt-5 border-t border-carbon/10 pt-4 text-xs font-semibold text-steel">
-            当前浏览器本地记录
+            {sourceLabel}
           </p>
         </Card>
       ))}

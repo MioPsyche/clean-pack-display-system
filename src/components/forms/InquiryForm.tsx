@@ -1,4 +1,5 @@
 import { FormEvent, useState } from 'react';
+import { createInquiry } from '../../api/inquiries';
 import type { InquiryRecord } from '../../types/inquiry';
 import { phoneNumber, required, type FieldErrors } from '../../utils/formValidation';
 import { createRecordId } from '../../utils/id';
@@ -21,11 +22,15 @@ const initialForm = {
 export function InquiryForm() {
   const [form, setForm] = useState(initialForm);
   const [errors, setErrors] = useState<FieldErrors<InquiryFields>>({});
-  const [submitted, setSubmitted] = useState(false);
+  const [submitMessage, setSubmitMessage] = useState<{
+    type: 'backend' | 'local';
+    text: string;
+  } | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   function updateField(field: keyof typeof initialForm, value: string) {
     setForm((current) => ({ ...current, [field]: value }));
-    setSubmitted(false);
+    setSubmitMessage(null);
   }
 
   function validate() {
@@ -45,7 +50,7 @@ export function InquiryForm() {
     return Object.keys(nextErrors).length === 0;
   }
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!validate()) {
       return;
@@ -62,10 +67,31 @@ export function InquiryForm() {
       createdAt: new Date().toISOString(),
     };
 
-    prependStorageRecord(STORAGE_KEYS.inquiries, record);
+    setIsSubmitting(true);
+    try {
+      await createInquiry({
+        name: record.name,
+        phone: record.phone,
+        organization: record.organization,
+        expectedScenario: record.expectedScenario,
+        budgetRange: record.budgetRange,
+        message: record.message,
+      });
+      setSubmitMessage({
+        type: 'backend',
+        text: '询价意向已提交到后端数据库，可登录 /admin 查看。',
+      });
+    } catch {
+      prependStorageRecord(STORAGE_KEYS.inquiries, record);
+      setSubmitMessage({
+        type: 'local',
+        text: '后端服务暂不可用，询价记录已保存到本地演示数据。',
+      });
+    }
+
     setForm(initialForm);
     setErrors({});
-    setSubmitted(true);
+    setIsSubmitting(false);
   }
 
   return (
@@ -118,12 +144,12 @@ export function InquiryForm() {
         placeholder="请描述关注点，例如设备模块、样机改型或展示合作需求"
         onChange={(event) => updateField('message', event.target.value)}
       />
-      <Button type="submit" className="w-full sm:w-auto">
-        提交询价意向
+      <Button type="submit" className="w-full sm:w-auto" disabled={isSubmitting}>
+        {isSubmitting ? '提交中…' : '提交询价意向'}
       </Button>
-      {submitted ? (
+      {submitMessage ? (
         <p className="rounded-2xl border border-aqua/15 bg-aqua/10 px-4 py-3 text-sm font-semibold text-carbon">
-          询价记录已保存到 localStorage，本地后台可查看。
+          {submitMessage.text}
         </p>
       ) : null}
     </form>

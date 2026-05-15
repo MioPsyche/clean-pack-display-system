@@ -20,7 +20,10 @@ export function exportCsv<T>(filename: string, columns: CsvColumn<T>[], records:
 
   link.href = url;
   link.download = filename;
+  link.style.display = 'none';
+  document.body.appendChild(link);
   link.click();
+  link.remove();
 
   URL.revokeObjectURL(url);
 }

@@ -1,15 +1,26 @@
 # Dependencies
 node_modules/
+server/node_modules/
 
 # Build output
 dist/
 dist-ssr/
+server/dist/
 *.tsbuildinfo
+server/data/
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
 
 # Local environment files
 .env
 .env.*
 !.env.example
+server/.env
+server/.env.*
+!server/.env.example
+src/.env
+src/.env.*
 doc-source/
 docs-source/
 source-data/

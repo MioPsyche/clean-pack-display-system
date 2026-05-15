@@ -8,6 +8,8 @@ type AdminToolbarProps = {
   consultationType: ConsultationTypeFilter;
   keyword: string;
   resultCount: number;
+  dataMode: 'backend' | 'local';
+  isLoading?: boolean;
   onConsultationTypeChange: (value: ConsultationTypeFilter) => void;
   onKeywordChange: (value: string) => void;
   onRefresh: () => void;
@@ -19,6 +21,8 @@ export function AdminToolbar({
   consultationType,
   keyword,
   resultCount,
+  dataMode,
+  isLoading = false,
   onConsultationTypeChange,
   onKeywordChange,
   onRefresh,
@@ -37,7 +41,7 @@ export function AdminToolbar({
         <div>
           <p className="text-xs font-bold uppercase tracking-[0.2em] text-aqua">Control Panel</p>
           <h2 className="mt-2 font-display text-2xl font-semibold tracking-[-0.03em] text-carbon">
-            本地记录管理
+            后台记录管理
           </h2>
         </div>
         <div className="w-fit rounded-2xl bg-mist px-4 py-2 text-sm font-semibold text-carbon tabular-nums">
@@ -80,7 +84,7 @@ export function AdminToolbar({
 
         <div className="grid gap-3 sm:grid-cols-3 xl:min-w-[26rem]">
           <Button variant="secondary" onClick={onRefresh}>
-            刷新数据
+            {isLoading ? '刷新中…' : '刷新数据'}
           </Button>
           <Button variant="secondary" onClick={onExportCsv}>
             导出 CSV
@@ -96,7 +100,9 @@ export function AdminToolbar({
       </div>
 
       <p className="mt-5 rounded-2xl bg-mist/70 px-4 py-3 text-xs leading-5 text-steel">
-        后台数据仅来自当前浏览器 localStorage。清空操作会删除本机浏览器中的预约演示和询价记录。
+        {dataMode === 'backend'
+          ? '后台数据来自本地 Express + SQLite 后端。清空操作会调用后端 DELETE 接口。'
+          : '当前使用本地演示模式。后台数据来自当前浏览器 localStorage，清空操作只删除本机浏览器中的演示记录。'}
       </p>
     </section>
   );

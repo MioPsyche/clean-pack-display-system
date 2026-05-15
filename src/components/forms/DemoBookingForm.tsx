@@ -1,4 +1,5 @@
 import { FormEvent, useState } from 'react';
+import { createBooking } from '../../api/bookings';
 import type { DemoBookingRecord } from '../../types/booking';
 import { phoneNumber, required, type FieldErrors } from '../../utils/formValidation';
 import { createRecordId } from '../../utils/id';
@@ -20,11 +21,15 @@ const initialForm = {
 export function DemoBookingForm() {
   const [form, setForm] = useState(initialForm);
   const [errors, setErrors] = useState<FieldErrors<DemoBookingFields>>({});
-  const [submitted, setSubmitted] = useState(false);
+  const [submitMessage, setSubmitMessage] = useState<{
+    type: 'backend' | 'local';
+    text: string;
+  } | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   function updateField(field: keyof typeof initialForm, value: string) {
     setForm((current) => ({ ...current, [field]: value }));
-    setSubmitted(false);
+    setSubmitMessage(null);
   }
 
   function validate() {
@@ -44,7 +49,7 @@ export function DemoBookingForm() {
     return Object.keys(nextErrors).length === 0;
   }
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!validate()) {
       return;
@@ -60,10 +65,30 @@ export function DemoBookingForm() {
       createdAt: new Date().toISOString(),
     };
 
-    prependStorageRecord(STORAGE_KEYS.demoBookings, record);
+    setIsSubmitting(true);
+    try {
+      await createBooking({
+        name: record.name,
+        phone: record.phone,
+        organization: record.organization,
+        preferredDate: record.preferredDate,
+        message: record.message,
+      });
+      setSubmitMessage({
+        type: 'backend',
+        text: '已提交到后端数据库，可登录 /admin 查看。',
+      });
+    } catch {
+      prependStorageRecord(STORAGE_KEYS.demoBookings, record);
+      setSubmitMessage({
+        type: 'local',
+        text: '后端服务暂不可用，已保存到本地演示数据。',
+      });
+    }
+
     setForm(initialForm);
     setErrors({});
-    setSubmitted(true);
+    setIsSubmitting(false);
   }
 
   return (
@@ -109,12 +134,12 @@ export function DemoBookingForm() {
         placeholder="例如：希望了解设备结构、样机运行流程或比赛展示内容"
         onChange={(event) => updateField('message', event.target.value)}
       />
-      <Button type="submit" className="w-full sm:w-auto">
-        提交预约演示
+      <Button type="submit" className="w-full sm:w-auto" disabled={isSubmitting}>
+        {isSubmitting ? '提交中…' : '提交预约演示'}
       </Button>
-      {submitted ? (
+      {submitMessage ? (
         <p className="rounded-2xl border border-leaf/20 bg-leaf/15 px-4 py-3 text-sm font-semibold text-carbon">
-          已写入本地模拟后台，可前往 /admin 查看。
+          {submitMessage.text}
         </p>
       ) : null}
     </form>
