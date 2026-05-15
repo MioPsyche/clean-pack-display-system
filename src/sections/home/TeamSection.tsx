@@ -1,4 +1,4 @@
-import { teamMembers } from '../../data/team';
+import { advisor, teamMembers } from '../../data/team';
 import { SectionShell } from '../../components/layout/SectionShell';
 import { Card } from '../../components/ui/Card';
 
@@ -8,7 +8,7 @@ export function TeamSection() {
       id="team"
       eyebrow="Team"
       title="团队分工清晰，便于答辩说明"
-      description="团队成员姓名暂以 TODO 占位，后续替换为真实姓名、学院、年级与职责。"
+      description="学生团队成员与指导教师分开展示，成员具体负责模块和任务分工后续可继续补充。"
     >
       <div className="grid gap-8 lg:grid-cols-[0.85fr_1.15fr]">
         <Card elevated className="overflow-hidden p-3">
@@ -26,6 +26,13 @@ export function TeamSection() {
               <p className="text-sm font-semibold text-carbon">团队照片待补充</p>
               <p className="mt-1 text-xs leading-5 text-steel">当前保留正式占位，不生成虚构团队图片。</p>
             </div>
+          </div>
+          <div className="mt-4 rounded-[1.4rem] border border-aqua/15 bg-mist/70 p-5">
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-aqua">Advisor</p>
+            <h3 className="mt-3 font-display text-xl font-semibold text-carbon">{advisor.name}</h3>
+            <p className="mt-1 text-sm font-semibold text-aqua">{advisor.title}</p>
+            <p className="mt-2 text-sm leading-6 text-steel">{advisor.organization}</p>
+            <p className="mt-3 text-sm leading-7 text-steel">{advisor.responsibility}</p>
           </div>
         </Card>
         <div className="grid gap-4">

@@ -2,33 +2,33 @@ import type { Achievement } from '../types/project';
 
 export const achievements: Achievement[] = [
   {
-    type: '竞赛材料',
-    title: '大学生创新创业训练计划项目展示材料',
-    status: '持续整理中',
+    type: '竞赛进展',
+    title: '第十二届机械结构创新设计大赛全国决赛',
+    status: '现阶段',
   },
   {
-    type: '软件著作权',
+    type: '大创项目',
+    title: '基于 5G 物联网与多场景应用的叶菜洁净一体机研究与实践',
+    status: '资料整理中',
+  },
+  {
+    type: '设备方案',
+    title: '自动上料、去根、清洗、分拣、称重、打捆包装一体化流程方案',
+    status: '方案展示中',
+  },
+  {
+    type: '机械创新',
+    title: '无电机纯机械重力碰撞自动卸料系统与双级复合流体力学清洗模组',
+    status: '文档已记录',
+  },
+  {
+    type: '检测控制',
+    title: '凸面圆柱透镜机器视觉检测光路与切根电机闭环控制方案',
+    status: '参数待补充',
+  },
+  {
+    type: '软件系统',
     title: '智能叶菜洁净化包装设备项目展示与询价管理系统 V1.0',
-    status: '源代码与说明材料整理中',
-  },
-  {
-    type: '机械样机',
-    title: '叶菜洁净化包装设备物理样机与结构说明',
-    status: '待补充真实样机图和测试记录',
-  },
-  {
-    type: '设计图纸',
-    title: 'SolidWorks 装配模型、爆炸图和关键模块说明',
-    status: '待替换真实图纸素材',
-  },
-  {
-    type: '项目文档',
-    title: '软件设计说明书、用户使用手册和版本说明',
-    status: 'TODO',
-  },
-  {
-    type: '后续成果',
-    title: '专利、论文、获奖或项目结题材料',
-    status: 'TODO',
+    status: '本地演示版',
   },
 ];

@@ -27,6 +27,13 @@ export type TeamMember = {
   responsibility: string;
 };
 
+export type Advisor = {
+  name: string;
+  title: string;
+  organization: string;
+  responsibility: string;
+};
+
 export type Achievement = {
   type: string;
   title: string;
