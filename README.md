@@ -63,6 +63,19 @@ npm run preview
 
 构建产物输出到 `dist` 目录。
 
+## Vercel 部署
+
+本项目可以作为 Vite 静态前端项目部署到 Vercel。
+
+推荐配置：
+
+- Framework Preset：Vite
+- Build Command：`npm run build`
+- Output Directory：`dist`
+- Install Command：`npm install`
+
+项目使用 React Router 的前端路由，已通过 `vercel.json` 将访问请求回退到 `index.html`，用于支持部署后直接访问 `/admin`。
+
 ## 项目结构
 
 ```text
