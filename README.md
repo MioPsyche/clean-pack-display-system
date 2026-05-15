@@ -58,7 +58,14 @@ npm run build
 本地预览构建产物：
 
 ```bash
+npm run build
 npm run preview
+```
+
+如需在同一局域网内通过其他设备访问预览页面：
+
+```bash
+npm run preview -- --host 0.0.0.0
 ```
 
 构建产物输出到 `dist` 目录。
@@ -75,6 +82,38 @@ npm run preview
 - Install Command：`npm install`
 
 项目使用 React Router 的前端路由，已通过 `vercel.json` 将访问请求回退到 `index.html`，用于支持部署后直接访问 `/admin`。
+
+## 网络访问说明
+
+Vercel 在线链接可用于公网演示。如果部分网络环境无法访问 Vercel 域名，或现场网络需要 VPN 才能打开在线链接，可使用本地运行方式进行演示。
+
+`/admin` 是浏览器 `localStorage` 本地模拟后台，不是服务端后台。不同设备、不同浏览器访问时，`localStorage` 数据互不共享。
+
+## 比赛现场演示方案
+
+建议比赛现场优先使用本地运行投屏，Vercel 作为备用在线链接。
+
+### 本地开发演示
+
+```bash
+npm install
+npm run dev
+```
+
+### 本地构建预览
+
+```bash
+npm run build
+npm run preview
+```
+
+### 局域网访问演示
+
+```bash
+npm run preview -- --host 0.0.0.0
+```
+
+同一 Wi-Fi 下的其他设备可以通过终端显示的 `Network` 地址访问预览页面。需要注意，其他设备访问时会使用该设备浏览器自己的 `localStorage`，不会读取投屏电脑浏览器中的 `/admin` 演示数据。
 
 ## 项目结构
 
