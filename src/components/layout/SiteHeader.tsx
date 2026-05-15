@@ -1,13 +1,19 @@
-import { useState } from 'react';
+import { type MouseEvent, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { navigationItems, projectProfile } from '../../data/projectProfile';
 import { cn } from '../../utils/cn';
+import { scrollToSection } from '../../utils/scrollToSection';
 import { MobileNav } from './MobileNav';
 
 export function SiteHeader() {
   const [isOpen, setIsOpen] = useState(false);
   const navLinkClassName =
     'shrink-0 rounded-full px-3.5 py-2 text-sm font-semibold text-carbon/78 transition-[background-color,color,box-shadow] duration-200 hover:bg-white/[0.62] hover:text-carbon focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-aqua xl:px-4';
+
+  function handleAnchorClick(event: MouseEvent<HTMLAnchorElement>, href: string) {
+    event.preventDefault();
+    scrollToSection(href);
+  }
 
   return (
     <header className="fixed left-0 right-0 top-0 z-[100] border-b border-aqua/15 bg-[#EAF8F5]/[0.82] text-carbon shadow-[0_10px_34px_rgba(7,21,22,0.06)] backdrop-blur-2xl backdrop-saturate-150">
@@ -39,7 +45,12 @@ export function SiteHeader() {
                 {item.label}
               </Link>
             ) : (
-              <a key={item.href} href={item.href} className={navLinkClassName}>
+              <a
+                key={item.href}
+                href={item.href}
+                className={navLinkClassName}
+                onClick={(event) => handleAnchorClick(event, item.href)}
+              >
                 {item.label}
               </a>
             )
@@ -56,6 +67,7 @@ export function SiteHeader() {
           <a
             href="#contact"
             className="inline-flex h-12 items-center justify-center rounded-full bg-[linear-gradient(135deg,#071516,#0A4250)] px-5 text-sm font-semibold text-white shadow-[0_14px_34px_rgba(7,21,22,0.16)] transition-[background-color,box-shadow,transform] duration-200 hover:-translate-y-0.5 hover:shadow-[0_18px_40px_rgba(7,21,22,0.2)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-aqua"
+            onClick={(event) => handleAnchorClick(event, '#contact')}
           >
             预约演示
           </a>

@@ -1,5 +1,7 @@
 import { Link } from 'react-router-dom';
+import type { MouseEvent } from 'react';
 import type { NavigationItem } from '../../types/project';
+import { scrollToSection } from '../../utils/scrollToSection';
 
 type MobileNavProps = {
   items: NavigationItem[];
@@ -7,6 +9,12 @@ type MobileNavProps = {
 };
 
 export function MobileNav({ items, onNavigate }: MobileNavProps) {
+  function handleAnchorClick(event: MouseEvent<HTMLAnchorElement>, href: string) {
+    event.preventDefault();
+    onNavigate();
+    window.requestAnimationFrame(() => scrollToSection(href));
+  }
+
   return (
     <div className="border-t border-white/40 bg-white/[0.68] px-4 py-3 shadow-lg backdrop-blur-2xl backdrop-saturate-150 sm:px-6 lg:hidden">
       <nav className="mx-auto grid max-w-7xl gap-2 rounded-[1.5rem] border border-white/55 bg-white/[0.72] p-2 shadow-sm backdrop-blur-2xl backdrop-saturate-150">
@@ -24,7 +32,7 @@ export function MobileNav({ items, onNavigate }: MobileNavProps) {
             <a
               key={item.href}
               href={item.href}
-              onClick={onNavigate}
+              onClick={(event) => handleAnchorClick(event, item.href)}
               className="rounded-2xl border border-transparent px-4 py-3 text-sm font-semibold text-slate-800 transition-[background-color,border-color,color] duration-200 hover:border-aqua/20 hover:bg-white/[0.86] hover:text-carbon focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-aqua"
             >
               {item.label}
@@ -40,7 +48,7 @@ export function MobileNav({ items, onNavigate }: MobileNavProps) {
         </Link>
         <a
           href="#contact"
-          onClick={onNavigate}
+          onClick={(event) => handleAnchorClick(event, '#contact')}
           className="rounded-2xl bg-carbon px-4 py-3 text-sm font-semibold text-white transition-[background-color,border-color,color] duration-200 hover:bg-graphite focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-aqua"
         >
           预约演示
