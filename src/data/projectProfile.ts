@@ -11,12 +11,10 @@ export const projectProfile = {
 };
 
 export const navigationItems: NavigationItem[] = [
-  { label: '首页', href: '#overview' },
-  { label: '项目背景', href: '#background' },
+  { label: '项目概览', href: '#overview' },
+  { label: '痛点方案', href: '#background' },
   { label: '设备结构', href: '#structure' },
-  { label: '创新点', href: '#innovation' },
   { label: '技术参数', href: '#specs' },
-  { label: '应用场景', href: '#scenarios' },
-  { label: '联系我们', href: '#contact' },
-  { label: '演示后台', href: '/admin' },
+  { label: '团队成果', href: '#team' },
+  { label: '预约询价', href: '#contact' },
 ];

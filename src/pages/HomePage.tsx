@@ -16,7 +16,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen overflow-x-hidden bg-[linear-gradient(180deg,#F6FBF9_0%,#EEF7F4_40%,#F8FBFC_100%)] text-carbon">
       <SiteHeader />
-      <main className="overflow-x-hidden pt-[76px] sm:pt-[80px]">
+      <main className="overflow-x-hidden pt-20">
         <HeroSection />
         <PainPointSection />
         <SolutionSection />
