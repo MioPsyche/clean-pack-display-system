@@ -38,7 +38,7 @@
 - 预约演示表单优先提交到后端 API，后端不可用时回退到 `localStorage`。
 - 询价意向表单优先提交到后端 API，后端不可用时回退到 `localStorage`。
 - `/admin` 优先从后端读取预约演示和询价意向数据。
-- `/admin` 支持查看、搜索、筛选、刷新、清空和导出 CSV。
+- `/admin` 支持查看、搜索、筛选、刷新、单条删除、清空和导出 CSV。
 - 后台展示模拟设备状态，支持启动、停止、开启警示、关闭警示。
 - 每次模拟设备操作写入操作日志，并记录操作人用户名。
 - 仅在后端不可达（网络错误）时才回退本地演示模式；后端返回的业务错误会在页面提示原因并保留当前数据。
@@ -223,6 +223,13 @@ npm run typecheck
 npm run preview
 ```
 
+代码检查与自动化测试（ESLint 覆盖前后端源码；前端单元测试基于 Vitest + happy-dom）：
+
+```bash
+npm run lint
+npm test
+```
+
 后端构建：
 
 ```bash
@@ -230,11 +237,12 @@ cd server
 npm run build
 ```
 
-后端类型检查：
+后端类型检查与接口测试（Vitest + supertest，测试使用独立的临时数据库）：
 
 ```bash
 cd server
 npm run typecheck
+npm test
 ```
 
 后端构建后运行：
@@ -262,11 +270,11 @@ npm start
 | `GET /api/bookings` | 需要 JWT | 预约演示列表 |
 | `POST /api/bookings` | 公开 | 提交预约演示 |
 | `DELETE /api/bookings` | 需要 JWT | 清空预约演示记录 |
-| `DELETE /api/bookings/:id` | 需要 JWT | 删除单条预约记录（预留，后台界面暂未使用） |
+| `DELETE /api/bookings/:id` | 需要 JWT | 删除单条预约记录 |
 | `GET /api/inquiries` | 需要 JWT | 询价意向列表 |
 | `POST /api/inquiries` | 公开 | 提交询价意向 |
 | `DELETE /api/inquiries` | 需要 JWT | 清空询价意向记录 |
-| `DELETE /api/inquiries/:id` | 需要 JWT | 删除单条询价记录（预留，后台界面暂未使用） |
+| `DELETE /api/inquiries/:id` | 需要 JWT | 删除单条询价记录 |
 | `GET /api/devices` | 公开 | 模拟设备列表 |
 | `POST /api/devices/:id/action` | 需要 JWT | 执行模拟设备操作 |
 | `GET /api/operation-logs` | 需要 JWT | 操作日志列表 |
@@ -292,7 +300,6 @@ npm start
 
 ## 后续扩展方向
 
-- 将前端 `/admin` 的状态管理继续拆分为更细的 hooks 或工具函数。
-- 增加更完整的浏览器验收流程。
-- 项目功能稳定后，再整理软件设计说明书、用户使用手册、版本说明和材料清单。
-- 后台界面接入单条记录删除接口（`DELETE /api/bookings/:id`、`DELETE /api/inquiries/:id`）。
+- 增加更完整的浏览器端到端验收流程。
+- 扩充自动化测试覆盖范围（当前覆盖前端工具函数与后端 API 主路径）。
+- 项目功能稳定后，持续同步软件设计说明书、用户使用手册、版本说明和材料清单。
