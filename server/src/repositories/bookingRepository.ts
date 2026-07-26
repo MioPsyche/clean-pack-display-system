@@ -23,7 +23,8 @@ export const bookingRepository = {
         input.email ?? null,
         input.preferredTime ?? null,
         input.message ?? null,
-        input.source ?? "api"
+        // source 由服务端固定写入，防止公开接口伪造 'seed' 等来源标记
+        "api"
       );
 
     return db.prepare("SELECT * FROM demo_bookings WHERE id = ?").get(Number(result.lastInsertRowid)) as BookingRow;

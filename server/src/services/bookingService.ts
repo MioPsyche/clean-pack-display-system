@@ -1,5 +1,7 @@
 import { bookingRepository } from "../repositories/bookingRepository.js";
 import type { Booking, BookingInput, BookingRow } from "../types/booking.js";
+import { HttpError } from "../utils/httpError.js";
+import { toIsoTimestamp } from "../utils/timestamp.js";
 
 const toBooking = (row: BookingRow): Booking => ({
   id: row.id,
@@ -11,8 +13,8 @@ const toBooking = (row: BookingRow): Booking => ({
   message: row.message,
   status: row.status,
   source: row.source,
-  createdAt: row.created_at,
-  updatedAt: row.updated_at
+  createdAt: toIsoTimestamp(row.created_at),
+  updatedAt: toIsoTimestamp(row.updated_at)
 });
 
 export const bookingService = {
@@ -31,8 +33,12 @@ export const bookingService = {
   },
 
   deleteById(id: number): { deleted: number } {
-    return {
-      deleted: bookingRepository.deleteById(id)
-    };
+    const deleted = bookingRepository.deleteById(id);
+
+    if (deleted === 0) {
+      throw new HttpError(404, "预约记录不存在。");
+    }
+
+    return { deleted };
   }
 };

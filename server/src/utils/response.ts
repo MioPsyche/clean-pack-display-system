@@ -6,3 +6,10 @@ export const sendSuccess = <T>(response: Response, data: T, statusCode = 200): v
     data
   });
 };
+
+export const sendError = (response: Response, statusCode: number, message: string): void => {
+  response.status(statusCode).json({
+    success: false,
+    message
+  });
+};

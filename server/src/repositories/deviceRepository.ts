@@ -18,7 +18,7 @@ export const deviceRepository = {
   },
 
   updateAction(id: number, update: DeviceUpdate): DeviceRow | null {
-    const current = this.findById(id);
+    const current = deviceRepository.findById(id);
 
     if (!current) {
       return null;
@@ -36,6 +36,6 @@ export const deviceRepository = {
     `
     ).run(update.runStatus ?? current.run_status, update.warningStatus ?? current.warning_status, update.lastAction, id);
 
-    return this.findById(id);
+    return deviceRepository.findById(id);
   }
 };

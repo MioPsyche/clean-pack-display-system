@@ -24,7 +24,8 @@ export const inquiryRepository = {
         input.quantity ?? null,
         input.scenario ?? null,
         input.requirements ?? null,
-        input.source ?? "api"
+        // source 由服务端固定写入，防止公开接口伪造 'seed' 等来源标记
+        "api"
       );
 
     return db.prepare("SELECT * FROM inquiries WHERE id = ?").get(Number(result.lastInsertRowid)) as InquiryRow;

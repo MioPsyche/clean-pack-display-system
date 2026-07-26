@@ -5,7 +5,6 @@ export interface BookingInput {
   email?: string;
   preferredTime?: string;
   message?: string;
-  source?: string;
 }
 
 export interface BookingRow {

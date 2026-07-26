@@ -6,7 +6,6 @@ export interface InquiryInput {
   quantity?: string;
   scenario?: string;
   requirements?: string;
-  source?: string;
 }
 
 export interface InquiryRow {

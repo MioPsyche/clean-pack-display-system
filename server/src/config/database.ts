@@ -11,6 +11,10 @@ fs.mkdirSync(path.dirname(env.databasePath), { recursive: true });
 
 export const db = new Database(env.databasePath);
 
+export const runInTransaction = <T>(work: () => T): T => {
+  return db.transaction(work)();
+};
+
 export const initializeDatabase = (): void => {
   db.pragma("foreign_keys = ON");
   db.pragma("journal_mode = WAL");

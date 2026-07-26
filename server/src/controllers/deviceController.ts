@@ -11,7 +11,11 @@ export const deviceController = {
 
   runAction(request: Request, response: Response): void {
     const body = asObject(request.body);
-    const result = deviceService.runAction(parseId(request.params.id), readRequiredString(body, "action"));
+    const result = deviceService.runAction(
+      parseId(request.params.id, "设备 id"),
+      readRequiredString(body, "action", { label: "操作类型", maxLength: 50 }),
+      request.user?.username
+    );
 
     sendSuccess(response, result);
   }

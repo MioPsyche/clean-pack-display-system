@@ -14,6 +14,9 @@ const seedDeviceNames = [
   "演示设备 C - 展示备用模拟机"
 ];
 
+// V1.1 之前启动时会插入这台英文占位设备，seed 时一并清理，避免新旧清单混在一起。
+const legacyDeviceNames = ["Leaf Cleaning Packaging Demo Device"];
+
 const seedBookings = [
   {
     name: "演示联系人 A",
@@ -51,7 +54,7 @@ const seedInquiries = [
     name: "演示询价 B",
     phone: "demo-inquiry-002",
     organization: "演示单位",
-    quantity: "TODO",
+    quantity: "待确认",
     scenario: "高校项目展示",
     requirements: "用于比赛展示的询价意向模拟数据。"
   },
@@ -65,6 +68,8 @@ const seedInquiries = [
   }
 ];
 
+// 服务启动时兜底：设备表为空则插入与 seed 脚本一致的演示设备，
+// 避免“先启动后 seed”与“先 seed 后启动”得到不同的设备清单。
 export const seedDefaultDevices = (db: DatabaseConnection): void => {
   const deviceCount = db.prepare("SELECT COUNT(*) AS count FROM devices").get() as { count: number };
 
@@ -74,7 +79,9 @@ export const seedDefaultDevices = (db: DatabaseConnection): void => {
 
   const insertDevice = db.prepare("INSERT INTO devices (name, run_status, warning_status) VALUES (?, ?, ?)");
 
-  insertDevice.run("Leaf Cleaning Packaging Demo Device", "stopped", 0);
+  seedDeviceNames.forEach((name) => {
+    insertDevice.run(name, "stopped", 0);
+  });
 };
 
 export const seedDemoData = async (db: DatabaseConnection): Promise<void> => {
@@ -100,10 +107,17 @@ export const seedDemoData = async (db: DatabaseConnection): Promise<void> => {
       );
     }
 
+    const managedDeviceNames = [...seedDeviceNames, ...legacyDeviceNames];
+    const managedDevicePlaceholders = managedDeviceNames.map(() => "?").join(", ");
+
+    // 先删除挂在演示设备上的运行期日志，避免设备被删后留下 device_id 为 NULL 的孤儿日志。
+    db.prepare(
+      `DELETE FROM operation_logs WHERE device_id IN (SELECT id FROM devices WHERE name IN (${managedDevicePlaceholders}))`
+    ).run(...managedDeviceNames);
     db.prepare("DELETE FROM operation_logs WHERE detail LIKE '[seed]%'").run();
-    db.prepare(`DELETE FROM devices WHERE name IN (${seedDeviceNames.map(() => "?").join(", ")})`).run(
-      ...seedDeviceNames
-    );
+    // 清理历史遗留的孤儿日志（设备已删除、device_id 为 NULL 的记录）。
+    db.prepare("DELETE FROM operation_logs WHERE device_id IS NULL").run();
+    db.prepare(`DELETE FROM devices WHERE name IN (${managedDevicePlaceholders})`).run(...managedDeviceNames);
     db.prepare("DELETE FROM demo_bookings WHERE source = 'seed'").run();
     db.prepare("DELETE FROM inquiries WHERE source = 'seed'").run();
 
@@ -187,7 +201,7 @@ const runSeedScript = async (): Promise<void> => {
   db.close();
 
   console.log("Demo seed data has been initialized.");
-  console.log("Default local demo admin: username=admin password=admin123456");
+  console.log("Default local demo admin (仅限本地演示): username=admin password=admin123456");
 };
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {

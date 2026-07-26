@@ -8,21 +8,21 @@ import { inquiryRoutes } from "./routes/inquiryRoutes.js";
 import { operationLogRoutes } from "./routes/operationLogRoutes.js";
 import { env } from "./config/env.js";
 import { errorMiddleware, notFoundMiddleware } from "./middleware/errorMiddleware.js";
+import { sendSuccess } from "./utils/response.js";
 
 const app = express();
 
+// 前端使用 Bearer token 而非 Cookie，无需 credentials
 app.use(
   cors({
-    origin: env.corsOrigin,
-    credentials: true
+    origin: env.corsOrigin
   })
 );
 
 app.use(express.json({ limit: "1mb" }));
 
 app.get("/api/health", (_request, response) => {
-  response.json({
-    success: true,
+  sendSuccess(response, {
     status: "ok",
     service: "clean-pack-display-server"
   });

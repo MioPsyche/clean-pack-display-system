@@ -1,5 +1,7 @@
 import { inquiryRepository } from "../repositories/inquiryRepository.js";
 import type { Inquiry, InquiryInput, InquiryRow } from "../types/inquiry.js";
+import { HttpError } from "../utils/httpError.js";
+import { toIsoTimestamp } from "../utils/timestamp.js";
 
 const toInquiry = (row: InquiryRow): Inquiry => ({
   id: row.id,
@@ -12,8 +14,8 @@ const toInquiry = (row: InquiryRow): Inquiry => ({
   requirements: row.requirements,
   status: row.status,
   source: row.source,
-  createdAt: row.created_at,
-  updatedAt: row.updated_at
+  createdAt: toIsoTimestamp(row.created_at),
+  updatedAt: toIsoTimestamp(row.updated_at)
 });
 
 export const inquiryService = {
@@ -32,8 +34,12 @@ export const inquiryService = {
   },
 
   deleteById(id: number): { deleted: number } {
-    return {
-      deleted: inquiryRepository.deleteById(id)
-    };
+    const deleted = inquiryRepository.deleteById(id);
+
+    if (deleted === 0) {
+      throw new HttpError(404, "询价记录不存在。");
+    }
+
+    return { deleted };
   }
 };
