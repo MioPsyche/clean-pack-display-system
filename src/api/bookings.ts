@@ -26,6 +26,7 @@ export type BookingPayload = {
 function toDemoBookingRecord(booking: ApiBooking): DemoBookingRecord {
   return {
     id: `api-demo-${booking.id}`,
+    backendId: booking.id,
     name: booking.name,
     phone: booking.phone,
     organization: booking.organization ?? undefined,
@@ -57,6 +58,13 @@ export async function createBooking(payload: BookingPayload) {
 
 export function clearBookings() {
   return apiRequest<{ deleted: number }>('/api/bookings', {
+    method: 'DELETE',
+    auth: true,
+  });
+}
+
+export function deleteBooking(id: number) {
+  return apiRequest<{ deleted: number }>(`/api/bookings/${id}`, {
     method: 'DELETE',
     auth: true,
   });

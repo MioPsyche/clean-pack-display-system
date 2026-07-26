@@ -28,6 +28,7 @@ export type InquiryPayload = {
 function toInquiryRecord(inquiry: ApiInquiry): InquiryRecord {
   return {
     id: `api-inq-${inquiry.id}`,
+    backendId: inquiry.id,
     name: inquiry.name,
     phone: inquiry.phone,
     organization: inquiry.organization ?? undefined,
@@ -61,6 +62,13 @@ export async function createInquiry(payload: InquiryPayload) {
 
 export function clearInquiries() {
   return apiRequest<{ deleted: number }>('/api/inquiries', {
+    method: 'DELETE',
+    auth: true,
+  });
+}
+
+export function deleteInquiry(id: number) {
+  return apiRequest<{ deleted: number }>(`/api/inquiries/${id}`, {
     method: 'DELETE',
     auth: true,
   });

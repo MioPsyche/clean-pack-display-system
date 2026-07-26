@@ -3,7 +3,7 @@ export type CsvColumn<T> = {
   value: (record: T) => string | number | undefined;
 };
 
-function escapeCsvCell(value: string | number | undefined) {
+export function escapeCsvCell(value: string | number | undefined) {
   let text = value === undefined ? '' : String(value);
 
   // 防公式注入：以 = + - @ 或制表符开头的值前置单引号，

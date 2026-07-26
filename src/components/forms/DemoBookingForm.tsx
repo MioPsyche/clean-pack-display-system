@@ -1,26 +1,11 @@
-import { FormEvent, useState } from 'react';
 import { createBooking } from '../../api/bookings';
-import { ApiError } from '../../api/client';
 import type { DemoBookingRecord } from '../../types/booking';
-import { phoneNumber, required, type FieldErrors } from '../../utils/formValidation';
 import { createRecordId } from '../../utils/id';
-import { prependStorageRecord, STORAGE_KEYS } from '../../utils/localStorage';
+import { STORAGE_KEYS } from '../../utils/localStorage';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
 import { Textarea } from '../ui/Textarea';
-
-type DemoBookingFields = 'name' | 'phone';
-
-type SubmitMessage = {
-  type: 'backend' | 'local' | 'error';
-  text: string;
-};
-
-const submitMessageStyles: Record<SubmitMessage['type'], string> = {
-  backend: 'rounded-2xl border border-leaf/25 bg-leaf/15 px-4 py-3 text-sm font-semibold text-carbon',
-  local: 'rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-800',
-  error: 'rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700',
-};
+import { submitMessageStyles, useRecordSubmit } from './useRecordSubmit';
 
 const initialForm = {
   name: '',
@@ -31,96 +16,30 @@ const initialForm = {
 };
 
 export function DemoBookingForm() {
-  const [form, setForm] = useState(initialForm);
-  const [errors, setErrors] = useState<FieldErrors<DemoBookingFields>>({});
-  const [submitMessage, setSubmitMessage] = useState<SubmitMessage | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  function updateField(field: keyof typeof initialForm, value: string) {
-    setForm((current) => ({ ...current, [field]: value }));
-    setSubmitMessage(null);
-
-    if (field === 'name' || field === 'phone') {
-      setErrors((current) => ({ ...current, [field]: undefined }));
-    }
-  }
-
-  function validate() {
-    const nextErrors: FieldErrors<DemoBookingFields> = {
-      name: required(form.name, '请填写联系人姓名'),
-      phone: phoneNumber(form.phone),
-    };
-
-    Object.keys(nextErrors).forEach((key) => {
-      const typedKey = key as DemoBookingFields;
-      if (!nextErrors[typedKey]) {
-        delete nextErrors[typedKey];
-      }
-    });
-
-    setErrors(nextErrors);
-    return Object.keys(nextErrors).length === 0;
-  }
-
-  function resetForm() {
-    setForm(initialForm);
-    setErrors({});
-  }
-
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    if (isSubmitting || !validate()) {
-      return;
-    }
-
-    const record: DemoBookingRecord = {
+  const { form, errors, submitMessage, isSubmitting, updateField, handleSubmit } = useRecordSubmit({
+    initialForm,
+    nameRequiredMessage: '请填写联系人姓名',
+    buildRecord: (current): DemoBookingRecord => ({
       id: createRecordId('demo'),
-      name: form.name.trim(),
-      phone: form.phone.trim(),
-      organization: form.organization.trim() || undefined,
-      preferredDate: form.preferredDate || undefined,
-      message: form.message.trim() || undefined,
+      name: current.name.trim(),
+      phone: current.phone.trim(),
+      organization: current.organization.trim() || undefined,
+      preferredDate: current.preferredDate || undefined,
+      message: current.message.trim() || undefined,
       createdAt: new Date().toISOString(),
-    };
-
-    setIsSubmitting(true);
-    try {
-      await createBooking({
+    }),
+    submitToBackend: (record) =>
+      createBooking({
         name: record.name,
         phone: record.phone,
         organization: record.organization,
         preferredDate: record.preferredDate,
         message: record.message,
-      });
-      setSubmitMessage({
-        type: 'backend',
-        text: '已提交到后端数据库，可登录 /admin 查看。',
-      });
-      resetForm();
-    } catch (error) {
-      if (error instanceof ApiError && error.status > 0) {
-        // 后端明确拒绝（如校验失败）：展示原因并保留表单内容，不写本地副本
-        setSubmitMessage({ type: 'error', text: `提交失败：${error.message}` });
-      } else {
-        // 后端不可达：降级保存到 localStorage
-        try {
-          prependStorageRecord(STORAGE_KEYS.demoBookings, record);
-          setSubmitMessage({
-            type: 'local',
-            text: '后端服务暂不可用，已保存到本地演示数据（仅当前浏览器可见）。',
-          });
-          resetForm();
-        } catch {
-          setSubmitMessage({
-            type: 'error',
-            text: '后端不可用，且本地存储写入失败，请稍后重试。',
-          });
-        }
-      }
-    } finally {
-      setIsSubmitting(false);
-    }
-  }
+      }),
+    storageKey: STORAGE_KEYS.demoBookings,
+    backendSuccessText: '已提交到后端数据库，可登录 /admin 查看。',
+    localFallbackText: '后端服务暂不可用，已保存到本地演示数据（仅当前浏览器可见）。',
+  });
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">

@@ -48,6 +48,14 @@ export function prependStorageRecord<T>(key: string, record: T) {
   writeStorageList(key, [record, ...current]);
 }
 
+export function removeStorageRecord(key: string, id: string) {
+  const current = readStorageList<{ id: string }>(key);
+  writeStorageList(
+    key,
+    current.filter((record) => record.id !== id),
+  );
+}
+
 export function removeStorageKeys(keys: string[]) {
   if (typeof window === 'undefined') {
     return;

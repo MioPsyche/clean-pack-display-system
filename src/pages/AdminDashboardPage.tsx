@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { clearAuthSession, getStoredUser, isLocalDemoSession } from '../api/auth';
-import { clearBookings, fetchBookings } from '../api/bookings';
+import { clearBookings, deleteBooking, fetchBookings } from '../api/bookings';
 import { ApiError, isAuthError, isUnreachableError } from '../api/client';
 import {
   fetchDevices,
@@ -11,7 +11,7 @@ import {
   type DeviceAction,
   type OperationLog,
 } from '../api/devices';
-import { clearInquiries, fetchInquiries } from '../api/inquiries';
+import { clearInquiries, deleteInquiry, fetchInquiries } from '../api/inquiries';
 import { AdminStatCards } from '../components/admin/AdminStatCards';
 import { AdminToolbar, type ConsultationTypeFilter } from '../components/admin/AdminToolbar';
 import { DemoBookingTable } from '../components/admin/DemoBookingTable';
@@ -25,7 +25,12 @@ import type { DemoBookingRecord } from '../types/booking';
 import type { InquiryRecord } from '../types/inquiry';
 import { exportCsv, type CsvColumn } from '../utils/csv';
 import { timestampToMillis } from '../utils/formatDate';
-import { readStorageList, removeStorageKeys, STORAGE_KEYS } from '../utils/localStorage';
+import {
+  readStorageList,
+  removeStorageKeys,
+  removeStorageRecord,
+  STORAGE_KEYS,
+} from '../utils/localStorage';
 
 type ExportRecord = {
   consultationType: string;
@@ -102,6 +107,7 @@ export default function AdminDashboardPage() {
   const [dataMode, setDataMode] = useState<DataMode>(isLocalDemoSession() ? 'local' : 'backend');
   const [isLoading, setIsLoading] = useState(false);
   const [isClearing, setIsClearing] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const [busyDeviceId, setBusyDeviceId] = useState<number | null>(null);
   const [statusMessage, setStatusMessage] = useState<StatusMessage | null>(null);
   const currentUser = useMemo(() => getStoredUser(), []);
@@ -286,6 +292,69 @@ export default function AdminDashboardPage() {
     setStatusMessage({ tone: 'success', text: '本地演示数据已清空。' });
   }
 
+  async function handleDeleteRecord(
+    kind: 'booking' | 'inquiry',
+    record: DemoBookingRecord | InquiryRecord,
+  ) {
+    if (deletingId) {
+      return;
+    }
+
+    const label = kind === 'booking' ? '预约演示' : '询价意向';
+    const confirmed = window.confirm(`确认删除${label}记录「${record.name}」？该操作无法恢复。`);
+    if (!confirmed) {
+      return;
+    }
+
+    const removeFromState = () => {
+      if (kind === 'booking') {
+        setBookings((current) => current.filter((item) => item.id !== record.id));
+      } else {
+        setInquiries((current) => current.filter((item) => item.id !== record.id));
+      }
+    };
+
+    if (dataMode === 'backend' && typeof record.backendId === 'number') {
+      setDeletingId(record.id);
+      try {
+        if (kind === 'booking') {
+          await deleteBooking(record.backendId);
+        } else {
+          await deleteInquiry(record.backendId);
+        }
+        removeFromState();
+        setStatusMessage({ tone: 'success', text: `已删除${label}记录「${record.name}」。` });
+      } catch (error) {
+        if (isAuthError(error)) {
+          handleSessionExpired();
+          return;
+        }
+
+        setStatusMessage({ tone: 'error', text: `删除失败：${apiErrorText(error)}` });
+
+        // 记录可能已在其他窗口被删除：刷新列表让页面与后端保持一致
+        if (error instanceof ApiError && error.status === 404) {
+          void loadAdminData();
+        }
+      } finally {
+        setDeletingId(null);
+      }
+      return;
+    }
+
+    if (dataMode === 'local') {
+      removeStorageRecord(
+        kind === 'booking' ? STORAGE_KEYS.demoBookings : STORAGE_KEYS.inquiries,
+        record.id,
+      );
+      removeFromState();
+      setStatusMessage({ tone: 'success', text: `已删除本地${label}记录「${record.name}」。` });
+      return;
+    }
+
+    setStatusMessage({ tone: 'error', text: '该记录缺少后端标识，无法删除，请刷新数据后重试。' });
+  }
+
   function handleExportCsv() {
     if (exportRecords.length === 0) {
       setStatusMessage({ tone: 'info', text: '当前筛选条件下没有可导出的记录。' });
@@ -437,6 +506,8 @@ export default function AdminDashboardPage() {
               isLoading={isLoading}
               emptyTitle={hasKeyword ? '没有匹配的预约演示记录' : '暂无预约演示记录'}
               emptyDescription={emptyDescription}
+              onDeleteRecord={(record) => void handleDeleteRecord('booking', record)}
+              deletingId={deletingId}
             />
           </section>
         ) : null}
@@ -457,6 +528,8 @@ export default function AdminDashboardPage() {
               isLoading={isLoading}
               emptyTitle={hasKeyword ? '没有匹配的询价意向记录' : '暂无询价记录'}
               emptyDescription={emptyDescription}
+              onDeleteRecord={(record) => void handleDeleteRecord('inquiry', record)}
+              deletingId={deletingId}
             />
           </section>
         ) : null}
