@@ -343,10 +343,15 @@ export default function AdminDashboardPage() {
     }
 
     if (dataMode === 'local') {
-      removeStorageRecord(
-        kind === 'booking' ? STORAGE_KEYS.demoBookings : STORAGE_KEYS.inquiries,
-        record.id,
-      );
+      try {
+        removeStorageRecord(
+          kind === 'booking' ? STORAGE_KEYS.demoBookings : STORAGE_KEYS.inquiries,
+          record.id,
+        );
+      } catch {
+        setStatusMessage({ tone: 'error', text: '本地存储不可用，删除失败，请检查浏览器设置。' });
+        return;
+      }
       removeFromState();
       setStatusMessage({ tone: 'success', text: `已删除本地${label}记录「${record.name}」。` });
       return;
