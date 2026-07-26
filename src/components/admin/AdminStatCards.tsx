@@ -1,5 +1,6 @@
 import type { DemoBookingRecord } from '../../types/booking';
 import type { InquiryRecord } from '../../types/inquiry';
+import { formatDateTime, timestampToMillis } from '../../utils/formatDate';
 import { Card } from '../ui/Card';
 
 type AdminStatCardsProps = {
@@ -14,19 +15,14 @@ function formatLatestDate(records: Array<{ createdAt: string }>) {
     return '暂无';
   }
 
-  return new Intl.DateTimeFormat('zh-CN', {
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-  }).format(new Date(latest));
+  return formatDateTime(latest, { withYear: false });
 }
 
 const numberFormatter = new Intl.NumberFormat('zh-CN');
 
 export function AdminStatCards({ bookings, inquiries, sourceLabel = '当前浏览器本地记录' }: AdminStatCardsProps) {
   const allRecords = [...bookings, ...inquiries].sort(
-    (left, right) => new Date(right.createdAt).getTime() - new Date(left.createdAt).getTime(),
+    (left, right) => timestampToMillis(right.createdAt) - timestampToMillis(left.createdAt),
   );
 
   const stats = [

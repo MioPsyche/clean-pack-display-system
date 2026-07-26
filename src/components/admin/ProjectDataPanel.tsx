@@ -5,7 +5,11 @@ import { techSpecs } from '../../data/specs';
 import { teamMembers } from '../../data/team';
 import { Card } from '../ui/Card';
 
-export function ProjectDataPanel() {
+type ProjectDataPanelProps = {
+  dataMode?: 'backend' | 'local';
+};
+
+export function ProjectDataPanel({ dataMode = 'local' }: ProjectDataPanelProps) {
   const groups = [
     { label: '痛点卡片', value: painPoints.length },
     { label: '创新点', value: innovations.length },
@@ -28,7 +32,7 @@ export function ProjectDataPanel() {
           </p>
         </div>
         <span className="w-fit rounded-full bg-carbon px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-white">
-          local demo
+          {dataMode === 'backend' ? 'backend data' : 'local demo'}
         </span>
       </div>
       <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

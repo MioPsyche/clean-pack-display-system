@@ -7,7 +7,7 @@ export type Device = {
   name: string;
   runStatus: string;
   warningStatus: boolean;
-  lastAction: DeviceAction | string | null;
+  lastAction: DeviceAction | null;
   createdAt: string;
   updatedAt: string;
 };

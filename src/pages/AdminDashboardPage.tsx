@@ -1,7 +1,8 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { clearAuthSession, getStoredUser } from '../api/auth';
+import { clearAuthSession, getStoredUser, isLocalDemoSession } from '../api/auth';
 import { clearBookings, fetchBookings } from '../api/bookings';
+import { ApiError, isAuthError, isUnreachableError } from '../api/client';
 import {
   fetchDevices,
   fetchOperationLogs,
@@ -19,11 +20,11 @@ import { InquiryTable } from '../components/admin/InquiryTable';
 import { OperationLogPanel } from '../components/admin/OperationLogPanel';
 import { ProjectDataPanel } from '../components/admin/ProjectDataPanel';
 import { SiteFooter } from '../components/layout/SiteFooter';
-import { Button } from '../components/ui/Button';
-import { buttonStyles } from '../components/ui/Button';
+import { Button, buttonStyles } from '../components/ui/Button';
 import type { DemoBookingRecord } from '../types/booking';
 import type { InquiryRecord } from '../types/inquiry';
 import { exportCsv, type CsvColumn } from '../utils/csv';
+import { timestampToMillis } from '../utils/formatDate';
 import { readStorageList, removeStorageKeys, STORAGE_KEYS } from '../utils/localStorage';
 
 type ExportRecord = {
@@ -39,6 +40,20 @@ type ExportRecord = {
 
 type DataMode = 'backend' | 'local';
 
+type StatusTone = 'info' | 'success' | 'warning' | 'error';
+
+type StatusMessage = {
+  tone: StatusTone;
+  text: string;
+};
+
+const statusToneStyles: Record<StatusTone, string> = {
+  info: 'rounded-2xl border border-aqua/15 bg-aqua/10 px-4 py-3 text-sm font-semibold text-carbon',
+  success: 'rounded-2xl border border-leaf/25 bg-leaf/15 px-4 py-3 text-sm font-semibold text-carbon',
+  warning: 'rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-800',
+  error: 'rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700',
+};
+
 function recordMatchesKeyword(record: DemoBookingRecord | InquiryRecord, keyword: string) {
   const normalizedKeyword = keyword.trim().toLowerCase();
   if (!normalizedKeyword) {
@@ -46,8 +61,12 @@ function recordMatchesKeyword(record: DemoBookingRecord | InquiryRecord, keyword
   }
 
   return [record.name, record.phone, record.organization]
-    .filter(Boolean)
-    .some((value) => value!.toLowerCase().includes(normalizedKeyword));
+    .filter((value): value is string => Boolean(value))
+    .some((value) => value.toLowerCase().includes(normalizedKeyword));
+}
+
+function apiErrorText(error: unknown) {
+  return error instanceof ApiError ? error.message : '未知错误';
 }
 
 function formatTimestampForFilename(date = new Date()) {
@@ -80,11 +99,19 @@ export default function AdminDashboardPage() {
   const [operationLogs, setOperationLogs] = useState<OperationLog[]>([]);
   const [consultationType, setConsultationType] = useState<ConsultationTypeFilter>('all');
   const [keyword, setKeyword] = useState('');
-  const [dataMode, setDataMode] = useState<DataMode>('backend');
+  const [dataMode, setDataMode] = useState<DataMode>(isLocalDemoSession() ? 'local' : 'backend');
   const [isLoading, setIsLoading] = useState(false);
-  const [isDeviceBusy, setIsDeviceBusy] = useState(false);
-  const [statusMessage, setStatusMessage] = useState('');
+  const [isClearing, setIsClearing] = useState(false);
+  const [busyDeviceId, setBusyDeviceId] = useState<number | null>(null);
+  const [statusMessage, setStatusMessage] = useState<StatusMessage | null>(null);
   const currentUser = useMemo(() => getStoredUser(), []);
+  // 请求序号：只接受最新一次加载的结果，避免旧响应覆盖新数据
+  const loadSeqRef = useRef(0);
+
+  const handleSessionExpired = useCallback(() => {
+    clearAuthSession();
+    navigate('/login', { replace: true, state: { from: { pathname: '/admin' } } });
+  }, [navigate]);
 
   const loadLocalRecords = useCallback(() => {
     setBookings(readStorageList<DemoBookingRecord>(STORAGE_KEYS.demoBookings));
@@ -95,8 +122,16 @@ export default function AdminDashboardPage() {
   }, []);
 
   const loadAdminData = useCallback(async () => {
+    // 本地演示登录不请求后端，直接读取本机数据，避免刷出一排 401
+    if (isLocalDemoSession()) {
+      loadLocalRecords();
+      setStatusMessage({ tone: 'info', text: '当前为本地演示模式登录，展示本机浏览器中的演示数据。' });
+      return;
+    }
+
+    const requestId = ++loadSeqRef.current;
     setIsLoading(true);
-    setStatusMessage('');
+    setStatusMessage(null);
 
     try {
       const [nextBookings, nextInquiries, nextDevices, nextOperationLogs] = await Promise.all([
@@ -106,21 +141,50 @@ export default function AdminDashboardPage() {
         fetchOperationLogs(),
       ]);
 
+      if (loadSeqRef.current !== requestId) {
+        return;
+      }
+
       setBookings(nextBookings);
       setInquiries(nextInquiries);
       setDevices(nextDevices);
       setOperationLogs(nextOperationLogs);
       setDataMode('backend');
-    } catch {
-      loadLocalRecords();
-      setStatusMessage('当前使用本地演示模式');
+    } catch (error) {
+      if (loadSeqRef.current !== requestId) {
+        return;
+      }
+
+      if (isAuthError(error)) {
+        handleSessionExpired();
+        return;
+      }
+
+      if (isUnreachableError(error)) {
+        loadLocalRecords();
+        setStatusMessage({ tone: 'warning', text: '后端服务不可用，已切换到本地演示模式。' });
+        return;
+      }
+
+      // 后端在线但返回了错误：保留当前数据并提示重试，而不是整页替换成本地数据
+      setStatusMessage({
+        tone: 'error',
+        text: `后端数据加载失败：${apiErrorText(error)}，可点击“刷新数据”重试。`,
+      });
     } finally {
-      setIsLoading(false);
+      if (loadSeqRef.current === requestId) {
+        setIsLoading(false);
+      }
     }
-  }, [loadLocalRecords]);
+  }, [handleSessionExpired, loadLocalRecords]);
 
   useEffect(() => {
     void loadAdminData();
+
+    return () => {
+      // 组件卸载后丢弃仍在途的响应
+      loadSeqRef.current += 1;
+    };
   }, [loadAdminData]);
 
   const filteredBookings = useMemo(() => {
@@ -162,14 +226,18 @@ export default function AdminDashboardPage() {
     }));
 
     return [...bookingRecords, ...inquiryRecords].sort(
-      (left, right) => new Date(right.createdAt).getTime() - new Date(left.createdAt).getTime(),
+      (left, right) => timestampToMillis(right.createdAt) - timestampToMillis(left.createdAt),
     );
   }, [filteredBookings, filteredInquiries]);
 
   async function handleClearAll() {
+    if (isClearing) {
+      return;
+    }
+
     const hasRecords = bookings.length > 0 || inquiries.length > 0;
     if (!hasRecords) {
-      window.alert('当前没有可清空的演示数据。');
+      setStatusMessage({ tone: 'info', text: '当前没有可清空的演示数据。' });
       return;
     }
 
@@ -184,53 +252,83 @@ export default function AdminDashboardPage() {
     }
 
     if (dataMode === 'backend') {
+      setIsClearing(true);
       try {
-        await Promise.all([clearBookings(), clearInquiries()]);
+        const results = await Promise.allSettled([clearBookings(), clearInquiries()]);
+        const failures = results.filter(
+          (result): result is PromiseRejectedResult => result.status === 'rejected',
+        );
+
+        if (failures.some((failure) => isAuthError(failure.reason))) {
+          handleSessionExpired();
+          return;
+        }
+
         await loadAdminData();
-        setStatusMessage('后端预约和询价记录已清空。');
-        return;
-      } catch {
-        setStatusMessage('当前使用本地演示模式');
+
+        if (failures.length > 0) {
+          setStatusMessage({
+            tone: 'error',
+            text: `部分记录清空失败：${apiErrorText(failures[0].reason)}，请刷新后重试。`,
+          });
+        } else {
+          setStatusMessage({ tone: 'success', text: '后端预约和询价记录已清空。' });
+        }
+      } finally {
+        setIsClearing(false);
       }
+      // 后端模式不再落到本地删除，避免后端清空失败时误删本机 localStorage 数据
+      return;
     }
 
     removeStorageKeys([STORAGE_KEYS.demoBookings, STORAGE_KEYS.inquiries]);
     loadLocalRecords();
+    setStatusMessage({ tone: 'success', text: '本地演示数据已清空。' });
   }
 
   function handleExportCsv() {
     if (exportRecords.length === 0) {
-      window.alert('当前筛选条件下没有可导出的记录。');
+      setStatusMessage({ tone: 'info', text: '当前筛选条件下没有可导出的记录。' });
       return;
     }
 
-    exportCsv(
-      `leaf-clean-admin-records-${formatTimestampForFilename()}.csv`,
-      exportColumns,
-      exportRecords,
-    );
+    try {
+      exportCsv(
+        `leaf-clean-admin-records-${formatTimestampForFilename()}.csv`,
+        exportColumns,
+        exportRecords,
+      );
+      setStatusMessage({ tone: 'success', text: `已导出 ${exportRecords.length} 条记录到 CSV 文件。` });
+    } catch {
+      setStatusMessage({ tone: 'error', text: 'CSV 导出失败，请重试或更换浏览器。' });
+    }
   }
 
   async function handleDeviceAction(deviceId: number, action: DeviceAction) {
-    setIsDeviceBusy(true);
-    setStatusMessage('');
+    setBusyDeviceId(deviceId);
+    setStatusMessage(null);
 
     try {
-      await runDeviceAction(deviceId, action);
-      const [nextDevices, nextOperationLogs] = await Promise.all([
-        fetchDevices(),
-        fetchOperationLogs(),
-      ]);
+      const { device } = await runDeviceAction(deviceId, action);
+      setDevices((current) => current.map((item) => (item.id === device.id ? device : item)));
 
-      setDevices(nextDevices);
-      setOperationLogs(nextOperationLogs);
-      setDataMode('backend');
-      setStatusMessage('模拟设备操作已写入后端操作日志。');
-    } catch {
-      loadLocalRecords();
-      setStatusMessage('当前使用本地演示模式，无法执行后端模拟设备控制。');
+      try {
+        setOperationLogs(await fetchOperationLogs());
+      } catch {
+        // 日志刷新失败不影响已成功的设备操作
+      }
+
+      setStatusMessage({ tone: 'success', text: '模拟设备操作已写入后端操作日志。' });
+    } catch (error) {
+      if (isAuthError(error)) {
+        handleSessionExpired();
+        return;
+      }
+
+      // 单次操作失败只提示，不清空页面数据、不切换数据模式
+      setStatusMessage({ tone: 'error', text: `模拟设备操作失败：${apiErrorText(error)}` });
     } finally {
-      setIsDeviceBusy(false);
+      setBusyDeviceId(null);
     }
   }
 
@@ -249,6 +347,10 @@ export default function AdminDashboardPage() {
   const showBookings = consultationType === 'all' || consultationType === 'demo';
   const showInquiries = consultationType === 'all' || consultationType === 'inquiry';
   const sourceLabel = dataMode === 'backend' ? '后端数据库记录' : '当前浏览器本地记录';
+  const banner: StatusMessage = statusMessage ?? {
+    tone: dataMode === 'backend' ? 'info' : 'warning',
+    text: dataMode === 'backend' ? '当前使用后端数据库模式' : '当前使用本地演示模式',
+  };
 
   return (
     <div className="min-h-screen overflow-x-hidden bg-[linear-gradient(180deg,#F6FBF9_0%,#E8F8F5_100%)] text-carbon">
@@ -292,16 +394,8 @@ export default function AdminDashboardPage() {
       </header>
 
       <main className="mx-auto max-w-[1400px] space-y-8 px-5 py-10 sm:px-8 lg:px-10">
-        <div
-          className={
-            dataMode === 'backend'
-              ? 'rounded-2xl border border-aqua/15 bg-aqua/10 px-4 py-3 text-sm font-semibold text-carbon'
-              : 'rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-800'
-          }
-        >
-          {dataMode === 'backend'
-            ? statusMessage || '当前使用后端数据库模式'
-            : statusMessage || '当前使用本地演示模式'}
+        <div className={statusToneStyles[banner.tone]} role="status" aria-live="polite">
+          {banner.text}
         </div>
 
         <AdminStatCards bookings={bookings} inquiries={inquiries} sourceLabel={sourceLabel} />
@@ -311,17 +405,18 @@ export default function AdminDashboardPage() {
           resultCount={filteredResultCount}
           dataMode={dataMode}
           isLoading={isLoading}
+          isClearing={isClearing}
           onConsultationTypeChange={setConsultationType}
           onKeywordChange={setKeyword}
           onRefresh={() => void loadAdminData()}
-          onClearAll={handleClearAll}
+          onClearAll={() => void handleClearAll()}
           onExportCsv={handleExportCsv}
         />
-        <ProjectDataPanel />
+        <ProjectDataPanel dataMode={dataMode} />
         <DeviceStatusPanel
           devices={devices}
           dataMode={dataMode}
-          isBusy={isDeviceBusy}
+          busyDeviceId={busyDeviceId}
           onAction={(deviceId, action) => void handleDeviceAction(deviceId, action)}
         />
         <OperationLogPanel logs={operationLogs} dataMode={dataMode} />
@@ -339,6 +434,7 @@ export default function AdminDashboardPage() {
             </div>
             <DemoBookingTable
               records={filteredBookings}
+              isLoading={isLoading}
               emptyTitle={hasKeyword ? '没有匹配的预约演示记录' : '暂无预约演示记录'}
               emptyDescription={emptyDescription}
             />
@@ -358,6 +454,7 @@ export default function AdminDashboardPage() {
             </div>
             <InquiryTable
               records={filteredInquiries}
+              isLoading={isLoading}
               emptyTitle={hasKeyword ? '没有匹配的询价意向记录' : '暂无询价记录'}
               emptyDescription={emptyDescription}
             />

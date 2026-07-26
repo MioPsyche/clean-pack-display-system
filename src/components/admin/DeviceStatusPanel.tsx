@@ -1,4 +1,5 @@
 import type { Device, DeviceAction } from '../../api/devices';
+import { formatDateTime } from '../../utils/formatDate';
 import { Button } from '../ui/Button';
 import { Card } from '../ui/Card';
 import { EmptyState } from '../ui/EmptyState';
@@ -6,7 +7,7 @@ import { EmptyState } from '../ui/EmptyState';
 type DeviceStatusPanelProps = {
   devices: Device[];
   dataMode: 'backend' | 'local';
-  isBusy?: boolean;
+  busyDeviceId?: number | null;
   onAction: (deviceId: number, action: DeviceAction) => void;
 };
 
@@ -17,19 +18,29 @@ const actionItems: Array<{ label: string; action: DeviceAction }> = [
   { label: '关闭警示', action: 'warning_off' },
 ];
 
-function formatDate(value: string) {
-  return new Intl.DateTimeFormat('zh-CN', {
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-  }).format(new Date(value));
+const actionLabels: Record<DeviceAction, string> = {
+  start: '启动',
+  stop: '停止',
+  warning_on: '开启警示',
+  warning_off: '关闭警示',
+};
+
+function formatRunStatus(runStatus: string) {
+  if (runStatus === 'running') {
+    return '运行中';
+  }
+
+  if (runStatus === 'stopped') {
+    return '已停止';
+  }
+
+  return runStatus;
 }
 
 export function DeviceStatusPanel({
   devices,
   dataMode,
-  isBusy = false,
+  busyDeviceId = null,
   onAction,
 }: DeviceStatusPanelProps) {
   if (devices.length === 0) {
@@ -66,48 +77,52 @@ export function DeviceStatusPanel({
       </div>
 
       <div className="grid gap-4 xl:grid-cols-2">
-        {devices.map((device) => (
-          <Card key={device.id} elevated className="bg-white p-5">
-            <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
-              <div>
-                <p className="text-xs font-bold uppercase tracking-[0.2em] text-steel">
-                  Device #{device.id}
-                </p>
-                <h3 className="mt-2 font-display text-xl font-semibold tracking-[-0.03em] text-carbon">
-                  {device.name}
-                </h3>
-                <div className="mt-4 flex flex-wrap gap-2">
-                  <span className="rounded-full bg-aqua/10 px-3 py-1 text-xs font-semibold text-carbon">
-                    运行状态：{device.runStatus === 'running' ? '运行中' : '已停止'}
-                  </span>
-                  <span className="rounded-full bg-mist px-3 py-1 text-xs font-semibold text-carbon">
-                    警示：{device.warningStatus ? '开启' : '关闭'}
-                  </span>
-                  <span className="rounded-full bg-carbon/5 px-3 py-1 text-xs font-semibold text-steel">
-                    最近操作：{device.lastAction ?? '暂无'}
-                  </span>
-                </div>
-                <p className="mt-4 text-xs font-semibold text-steel">
-                  更新时间：{formatDate(device.updatedAt)}
-                </p>
-              </div>
+        {devices.map((device) => {
+          const isDeviceBusy = busyDeviceId === device.id;
 
-              <div className="grid gap-2 sm:grid-cols-2 lg:min-w-64">
-                {actionItems.map((item) => (
-                  <Button
-                    key={item.action}
-                    variant="secondary"
-                    size="sm"
-                    disabled={isBusy || dataMode === 'local'}
-                    onClick={() => onAction(device.id, item.action)}
-                  >
-                    {item.label}
-                  </Button>
-                ))}
+          return (
+            <Card key={device.id} elevated className="bg-white p-5">
+              <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-[0.2em] text-steel">
+                    Device #{device.id}
+                  </p>
+                  <h3 className="mt-2 font-display text-xl font-semibold tracking-[-0.03em] text-carbon">
+                    {device.name}
+                  </h3>
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    <span className="rounded-full bg-aqua/10 px-3 py-1 text-xs font-semibold text-carbon">
+                      运行状态：{formatRunStatus(device.runStatus)}
+                    </span>
+                    <span className="rounded-full bg-mist px-3 py-1 text-xs font-semibold text-carbon">
+                      警示：{device.warningStatus ? '开启' : '关闭'}
+                    </span>
+                    <span className="rounded-full bg-carbon/5 px-3 py-1 text-xs font-semibold text-steel">
+                      最近操作：{device.lastAction ? actionLabels[device.lastAction] ?? device.lastAction : '暂无'}
+                    </span>
+                  </div>
+                  <p className="mt-4 text-xs font-semibold text-steel">
+                    更新时间：{formatDateTime(device.updatedAt, { withYear: false })}
+                  </p>
+                </div>
+
+                <div className="grid gap-2 sm:grid-cols-2 lg:min-w-64">
+                  {actionItems.map((item) => (
+                    <Button
+                      key={item.action}
+                      variant="secondary"
+                      size="sm"
+                      disabled={isDeviceBusy || dataMode === 'local'}
+                      onClick={() => onAction(device.id, item.action)}
+                    >
+                      {isDeviceBusy ? '执行中…' : item.label}
+                    </Button>
+                  ))}
+                </div>
               </div>
-            </div>
-          </Card>
-        ))}
+            </Card>
+          );
+        })}
       </div>
     </section>
   );

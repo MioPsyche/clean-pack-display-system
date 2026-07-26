@@ -1,7 +1,10 @@
 import type { NavigationItem } from '../types/project';
 
+// 站点统一版本号：页面各处展示引用此常量；package.json 与 index.html 需手工保持同步。
+export const APP_VERSION = 'V1.1';
+
 export const projectProfile = {
-  name: '智能叶菜洁净化包装设备项目展示与询价管理系统 V1.0',
+  name: `智能叶菜洁净化包装设备项目展示与询价管理系统 ${APP_VERSION}`,
   shortName: '叶菜洁净一体机',
   subtitle: '基于 5G 物联网与多场景应用的中小型叶菜洁净化加工装备研究与实践',
   positioning: '大学生创新创业训练计划比赛展示系统',

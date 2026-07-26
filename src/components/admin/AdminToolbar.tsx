@@ -10,6 +10,7 @@ type AdminToolbarProps = {
   resultCount: number;
   dataMode: 'backend' | 'local';
   isLoading?: boolean;
+  isClearing?: boolean;
   onConsultationTypeChange: (value: ConsultationTypeFilter) => void;
   onKeywordChange: (value: string) => void;
   onRefresh: () => void;
@@ -23,6 +24,7 @@ export function AdminToolbar({
   resultCount,
   dataMode,
   isLoading = false,
+  isClearing = false,
   onConsultationTypeChange,
   onKeywordChange,
   onRefresh,
@@ -83,18 +85,19 @@ export function AdminToolbar({
         </div>
 
         <div className="grid gap-3 sm:grid-cols-3 xl:min-w-[26rem]">
-          <Button variant="secondary" onClick={onRefresh}>
+          <Button variant="secondary" disabled={isLoading} onClick={onRefresh}>
             {isLoading ? '刷新中…' : '刷新数据'}
           </Button>
-          <Button variant="secondary" onClick={onExportCsv}>
+          <Button variant="secondary" disabled={isLoading} onClick={onExportCsv}>
             导出 CSV
           </Button>
           <Button
             variant="secondary"
             className="border-red-200 bg-red-50 text-red-700 hover:border-red-300 hover:bg-red-100 focus-visible:outline-red-500"
+            disabled={isLoading || isClearing}
             onClick={onClearAll}
           >
-            清空全部
+            {isClearing ? '清空中…' : '清空全部'}
           </Button>
         </div>
       </div>

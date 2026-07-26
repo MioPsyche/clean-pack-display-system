@@ -1,10 +1,12 @@
-import { FormEvent, useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { createLocalDemoSession, login, register } from '../api/auth';
+import { ApiError } from '../api/client';
 import { SiteFooter } from '../components/layout/SiteFooter';
 import { Button, buttonStyles } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
 import { Input } from '../components/ui/Input';
+import { APP_VERSION } from '../data/projectProfile';
 import { cn } from '../utils/cn';
 
 type AuthMode = 'login' | 'register';
@@ -33,6 +35,12 @@ export default function LoginPage({ initialMode = 'login' }: LoginPageProps) {
   const location = useLocation();
   const redirectTo = (location.state as LocationState | null)?.from?.pathname ?? '/admin';
 
+  // /login 与 /register 复用同一组件实例，路由切换时同步模式
+  useEffect(() => {
+    setMode(initialMode);
+    setError('');
+  }, [initialMode]);
+
   function updateField(field: keyof typeof initialForm, value: string) {
     setForm((current) => ({ ...current, [field]: value }));
     setError('');
@@ -42,14 +50,27 @@ export default function LoginPage({ initialMode = 'login' }: LoginPageProps) {
     event.preventDefault();
     setError('');
 
-    if (form.username.trim().length < 3) {
-      setError('账号至少需要 3 个字符。');
+    if (!form.username.trim()) {
+      setError('请填写账号。');
       return;
     }
 
-    if (form.password.length < 6) {
-      setError('密码至少需要 6 个字符。');
+    if (!form.password) {
+      setError('请填写密码。');
       return;
+    }
+
+    // 长度规则只约束注册；登录交给后端校验，避免历史账号被前端拦住
+    if (mode === 'register') {
+      if (form.username.trim().length < 3) {
+        setError('账号至少需要 3 个字符。');
+        return;
+      }
+
+      if (form.password.length < 6) {
+        setError('密码至少需要 6 个字符。');
+        return;
+      }
     }
 
     setIsSubmitting(true);
@@ -66,11 +87,15 @@ export default function LoginPage({ initialMode = 'login' }: LoginPageProps) {
       }
 
       navigate(redirectTo, { replace: true });
-    } catch {
-      setError(mode === 'login' ? '登录失败，请检查账号、密码或后端服务。' : '注册失败，请更换账号或检查后端服务。');
-    } finally {
-      setIsSubmitting(false);
+      return;
+    } catch (submitError) {
+      if (submitError instanceof ApiError && submitError.status > 0) {
+        setError(submitError.message);
+      } else {
+        setError('无法连接后端服务，请确认后端已启动，或使用下方的本地演示模式。');
+      }
     }
+    setIsSubmitting(false);
   }
 
   function handleLocalDemoLogin() {
@@ -108,10 +133,10 @@ export default function LoginPage({ initialMode = 'login' }: LoginPageProps) {
         </div>
       </header>
 
-      <main className="mx-auto flex min-h-[calc(100vh-17rem)] max-w-6xl items-center px-5 py-10 sm:px-8 lg:px-10">
+      <main className="mx-auto flex min-h-[60vh] max-w-6xl items-center px-5 py-10 sm:px-8 lg:px-10">
         <div className="grid w-full gap-6 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
           <div className="max-w-2xl">
-            <p className="text-sm font-semibold text-aqua">V1.1 Backend Demo</p>
+            <p className="text-sm font-semibold text-aqua">{APP_VERSION} Backend Demo</p>
             <h2 className="mt-3 font-display text-4xl font-semibold tracking-[-0.05em] text-carbon sm:text-5xl">
               使用 JWT 进入本地后台
             </h2>
@@ -148,6 +173,7 @@ export default function LoginPage({ initialMode = 'login' }: LoginPageProps) {
                 label="账号"
                 name="admin-username"
                 autoComplete="username"
+                maxLength={50}
                 value={form.username}
                 placeholder="例如：admin_demo"
                 onChange={(event) => updateField('username', event.target.value)}
@@ -157,13 +183,17 @@ export default function LoginPage({ initialMode = 'login' }: LoginPageProps) {
                 name="admin-password"
                 type="password"
                 autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
+                maxLength={72}
                 value={form.password}
-                placeholder="至少 6 位"
+                placeholder={mode === 'register' ? '至少 6 位' : '请输入密码'}
                 onChange={(event) => updateField('password', event.target.value)}
               />
 
               {error ? (
-                <p className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">
+                <p
+                  className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700"
+                  role="alert"
+                >
                   {error}
                 </p>
               ) : null}
@@ -177,6 +207,7 @@ export default function LoginPage({ initialMode = 'login' }: LoginPageProps) {
               <Button
                 variant="secondary"
                 className="w-full"
+                disabled={isSubmitting}
                 onClick={handleLocalDemoLogin}
               >
                 后端不可用时进入本地演示模式

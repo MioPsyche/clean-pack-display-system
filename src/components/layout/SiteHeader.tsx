@@ -1,6 +1,6 @@
 import { type MouseEvent, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { navigationItems, projectProfile } from '../../data/projectProfile';
+import { APP_VERSION, navigationItems, projectProfile } from '../../data/projectProfile';
 import { cn } from '../../utils/cn';
 import { scrollToSection } from '../../utils/scrollToSection';
 import { MobileNav } from './MobileNav';
@@ -30,7 +30,7 @@ export function SiteHeader() {
               {projectProfile.shortName}
             </span>
             <span className="hidden text-xs font-medium tracking-[-0.01em] text-steel sm:block">
-              Dachuang Showcase V1.0
+              Dachuang Showcase {APP_VERSION}
             </span>
           </span>
         </Link>

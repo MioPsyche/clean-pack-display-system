@@ -1,3 +1,5 @@
+import { useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { SiteFooter } from '../components/layout/SiteFooter';
 import { SiteHeader } from '../components/layout/SiteHeader';
 import { AchievementSection } from '../sections/home/AchievementSection';
@@ -11,8 +13,18 @@ import { PrototypeSection } from '../sections/home/PrototypeSection';
 import { SolutionSection } from '../sections/home/SolutionSection';
 import { TeamSection } from '../sections/home/TeamSection';
 import { TechSpecsSection } from '../sections/home/TechSpecsSection';
+import { scrollToSection } from '../utils/scrollToSection';
 
 export default function HomePage() {
+  const { hash } = useLocation();
+
+  // 支持从其他页面通过 /#contact 这类链接跳回首页锚点
+  useEffect(() => {
+    if (hash) {
+      requestAnimationFrame(() => scrollToSection(hash));
+    }
+  }, [hash]);
+
   return (
     <div className="min-h-screen overflow-x-hidden bg-[linear-gradient(180deg,#F6FBF9_0%,#EEF7F4_40%,#F8FBFC_100%)] text-carbon">
       <SiteHeader />

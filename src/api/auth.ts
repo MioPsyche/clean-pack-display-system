@@ -2,6 +2,7 @@ import {
   apiRequest,
   clearAuthToken,
   getAuthToken,
+  LOCAL_DEMO_TOKEN,
   setAuthToken,
 } from './client';
 
@@ -26,16 +27,62 @@ export type AuthPayload = {
 
 export function saveAuthSession(session: AuthSession) {
   setAuthToken(session.token);
-  window.localStorage.setItem(AUTH_USER_KEY, JSON.stringify(session.user));
+
+  try {
+    window.localStorage.setItem(AUTH_USER_KEY, JSON.stringify(session.user));
+  } catch {
+    // 存储不可用时仅影响用户名展示
+  }
 }
 
 export function clearAuthSession() {
   clearAuthToken();
-  window.localStorage.removeItem(AUTH_USER_KEY);
+
+  try {
+    window.localStorage.removeItem(AUTH_USER_KEY);
+  } catch {
+    // 忽略存储不可用
+  }
+}
+
+// 解析 JWT 的过期时间（毫秒）；不是 JWT（如本地演示 token）时返回 null
+function decodeJwtExpiry(token: string): number | null {
+  const parts = token.split('.');
+
+  if (parts.length !== 3) {
+    return null;
+  }
+
+  try {
+    const base64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');
+    const padded = base64.padEnd(base64.length + ((4 - (base64.length % 4)) % 4), '=');
+    const payload = JSON.parse(window.atob(padded)) as { exp?: unknown };
+    return typeof payload.exp === 'number' ? payload.exp * 1000 : null;
+  } catch {
+    return null;
+  }
 }
 
 export function hasAuthSession() {
-  return Boolean(getAuthToken());
+  const token = getAuthToken();
+
+  if (!token) {
+    return false;
+  }
+
+  const expiresAt = decodeJwtExpiry(token);
+
+  if (expiresAt !== null && expiresAt <= Date.now()) {
+    // JWT 已过期：清理会话让用户重新登录，而不是进入后台后所有请求 401
+    clearAuthSession();
+    return false;
+  }
+
+  return true;
+}
+
+export function isLocalDemoSession() {
+  return getAuthToken() === LOCAL_DEMO_TOKEN;
 }
 
 export function getStoredUser(): AuthUser | null {
@@ -49,7 +96,7 @@ export function getStoredUser(): AuthUser | null {
 
 export function createLocalDemoSession() {
   saveAuthSession({
-    token: 'local-demo-token',
+    token: LOCAL_DEMO_TOKEN,
     user: {
       id: 0,
       username: 'local-demo',

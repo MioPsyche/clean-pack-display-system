@@ -9,7 +9,7 @@ export function ContactActionSection() {
       id="contact"
       eyebrow="Contact"
       title="预约演示与询价意向"
-      description="表单不会发送到服务器，提交内容仅保存在当前浏览器 localStorage 中，用于比赛现场演示。"
+      description="表单优先提交到本地后端数据库；后端不可用时自动保存到当前浏览器 localStorage，仅用于比赛现场演示。"
       className="bg-[radial-gradient(circle_at_15%_0%,rgba(15,163,161,0.12),transparent_30%),linear-gradient(180deg,#EEF7F4_0%,#F8FBFC_100%)]"
     >
       <div className="grid gap-5 lg:grid-cols-2 lg:gap-6">

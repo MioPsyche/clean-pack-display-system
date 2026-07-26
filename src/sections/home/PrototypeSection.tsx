@@ -31,7 +31,7 @@ export function PrototypeSection() {
         </div>
         <Card className="bg-none overflow-hidden border-white/15 bg-white/[0.065] p-2.5 shadow-[0_22px_70px_rgba(0,0,0,0.22)] ring-1 ring-white/10 sm:p-3">
           <img
-            src="/images/structure-detail.png"
+            src="/images/structure-detail.webp"
             alt="智能叶菜洁净化包装设备结构细节展示"
             width="1536"
             height="1024"

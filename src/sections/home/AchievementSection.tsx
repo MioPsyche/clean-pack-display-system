@@ -14,7 +14,7 @@ export function AchievementSection() {
       <Card className="bg-none mb-8 overflow-hidden border-white/15 bg-white/[0.065] p-3 text-white shadow-[0_22px_70px_rgba(0,0,0,0.22)] ring-1 ring-white/10">
         <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr] lg:items-center">
           <img
-            src="/images/structure-detail.png"
+            src="/images/structure-detail.webp"
             alt="智能叶菜洁净化包装设备结构细节展示"
             width="1536"
             height="1024"

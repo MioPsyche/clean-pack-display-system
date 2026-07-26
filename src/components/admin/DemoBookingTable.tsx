@@ -1,33 +1,34 @@
 import type { DemoBookingRecord } from '../../types/booking';
+import { formatDateTime } from '../../utils/formatDate';
 import { EmptyState } from '../ui/EmptyState';
 
 type DemoBookingTableProps = {
   records: DemoBookingRecord[];
+  isLoading?: boolean;
   emptyTitle?: string;
   emptyDescription?: string;
 };
 
-function formatDate(value: string) {
-  return new Intl.DateTimeFormat('zh-CN', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-  }).format(new Date(value));
-}
-
 export function DemoBookingTable({
   records,
+  isLoading = false,
   emptyTitle = '暂无预约演示记录',
-  emptyDescription = '在前台页面提交预约演示后，这里会读取 localStorage 并展示记录。',
+  emptyDescription = '在前台页面提交预约演示后，这里会展示相应记录。',
 }: DemoBookingTableProps) {
   if (records.length === 0) {
-    return <EmptyState title={emptyTitle} description={emptyDescription} />;
+    return (
+      <EmptyState
+        title={isLoading ? '正在加载数据…' : emptyTitle}
+        description={isLoading ? '正在读取预约演示记录，请稍候。' : emptyDescription}
+      />
+    );
   }
 
   return (
     <div className="overflow-hidden rounded-[2rem] border border-white/70 bg-white shadow-panel-soft">
+      <p className="border-b border-carbon/10 bg-mist/60 px-5 py-2 text-center text-xs font-medium text-steel md:hidden">
+        ← 左右滑动查看完整表格 →
+      </p>
       <div className="overflow-x-auto">
         <table className="w-full min-w-[900px] text-left text-sm">
           <caption className="sr-only">预约演示记录表</caption>
@@ -47,7 +48,7 @@ export function DemoBookingTable({
               <td className="px-5 py-4">
                 <div className="flex items-center gap-3">
                   <span className="grid h-9 w-9 place-items-center rounded-full bg-aqua/10 text-sm font-bold text-aqua">
-                    {record.name.slice(0, 1)}
+                    {Array.from(record.name)[0] ?? '?'}
                   </span>
                   <span className="font-semibold">{record.name}</span>
                 </div>
@@ -63,7 +64,7 @@ export function DemoBookingTable({
                 {record.message ?? '未填写'}
               </td>
               <td className="whitespace-nowrap px-5 py-4 text-steel tabular-nums">
-                {formatDate(record.createdAt)}
+                {formatDateTime(record.createdAt)}
               </td>
             </tr>
           ))}

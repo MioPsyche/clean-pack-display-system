@@ -1,11 +1,11 @@
-import { projectProfile } from '../../data/projectProfile';
+import { APP_VERSION, projectProfile } from '../../data/projectProfile';
 import { Badge } from '../../components/ui/Badge';
 import { buttonStyles } from '../../components/ui/Button';
 
 const heroStats = [
-  { label: '系统版本', value: 'V1.0' },
+  { label: '系统版本', value: APP_VERSION },
   { label: '参数状态', value: '待实测' },
-  { label: '数据模式', value: '本地演示' },
+  { label: '数据模式', value: '本地后端演示' },
 ];
 
 export function HeroSection() {
@@ -71,7 +71,7 @@ export function HeroSection() {
               Prototype Display
             </div>
             <img
-              src="/images/hero-machine.png"
+              src="/images/hero-machine.webp"
               alt="智能叶菜洁净化包装设备主视觉图"
               width="1536"
               height="1024"
@@ -84,7 +84,7 @@ export function HeroSection() {
             />
             <div className="absolute bottom-6 right-6 z-20 hidden rounded-3xl border border-white/55 bg-white/[0.88] p-4 shadow-panel backdrop-blur-xl sm:block">
               <p className="text-xs font-bold uppercase tracking-[0.2em] text-aqua">Local Demo</p>
-              <p className="mt-1 text-sm font-semibold text-carbon">静态数据 + localStorage</p>
+              <p className="mt-1 text-sm font-semibold text-carbon">本地后端 + localStorage 回退</p>
             </div>
           </div>
           <div className="relative -mt-7 ml-3 mr-3 rounded-3xl border border-white/70 bg-white/[0.92] p-4 shadow-panel backdrop-blur-xl sm:absolute sm:-bottom-7 sm:left-8 sm:right-8 sm:ml-0 sm:mr-0 sm:p-5">

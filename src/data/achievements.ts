@@ -1,4 +1,5 @@
 import type { Achievement } from '../types/project';
+import { APP_VERSION } from './projectProfile';
 
 export const achievements: Achievement[] = [
   {
@@ -28,7 +29,7 @@ export const achievements: Achievement[] = [
   },
   {
     type: '软件系统',
-    title: '智能叶菜洁净化包装设备项目展示与询价管理系统 V1.0',
+    title: `智能叶菜洁净化包装设备项目展示与询价管理系统 ${APP_VERSION}`,
     status: '本地演示版',
   },
 ];

@@ -20,9 +20,9 @@ export function SiteFooter() {
           <Link className="rounded-full border border-white/10 px-4 py-2 transition hover:border-mint/40 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-mint" to="/admin">
             本地模拟后台
           </Link>
-          <a className="rounded-full border border-white/10 px-4 py-2 transition hover:border-mint/40 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-mint" href="#contact">
+          <Link className="rounded-full border border-white/10 px-4 py-2 transition hover:border-mint/40 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-mint" to="/#contact">
             预约询价
-          </a>
+          </Link>
         </div>
       </div>
     </footer>

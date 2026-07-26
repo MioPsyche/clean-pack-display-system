@@ -19,7 +19,7 @@ export function DeviceStructureSection() {
               Exploded View
             </div>
             <img
-              src="/images/machine-exploded_1.png"
+              src="/images/machine-exploded_1.webp"
               alt="智能叶菜洁净化包装设备 SolidWorks 爆炸图"
               width="1536"
               height="1024"
@@ -63,7 +63,7 @@ export function DeviceStructureSection() {
       <div className="mt-6 grid gap-6 md:grid-cols-2 lg:mt-7 lg:gap-7">
         <Card elevated className="overflow-hidden p-2.5 sm:p-3">
           <img
-            src="/images/hero-machine.png"
+            src="/images/hero-machine.webp"
             alt="智能叶菜洁净化包装设备物理样机图"
             width="1536"
             height="1024"
@@ -84,7 +84,7 @@ export function DeviceStructureSection() {
 
         <Card elevated className="overflow-hidden p-2.5 sm:p-3">
           <img
-            src="/images/structure-detail.png"
+            src="/images/structure-detail.webp"
             alt="智能叶菜洁净化包装设备结构细节图"
             width="1536"
             height="1024"
