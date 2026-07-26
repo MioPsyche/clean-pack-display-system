@@ -24,10 +24,7 @@ src/.env.*
 doc-source/
 docs-source/
 source-data/
-copyright-docs/
-copyright-export/
-copyright-submit/
-copyright-final/
+copyright/
 image-originals/
 scripts/
 
