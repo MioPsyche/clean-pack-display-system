@@ -9,7 +9,6 @@ export function SolutionSection() {
       dark
       eyebrow="Solution"
       title="以模块化流程组织设备方案"
-      description="页面中的能力描述用于项目展示，具体机械参数和性能指标以后续实测结果为准。"
       className="bg-[radial-gradient(circle_at_top_right,rgba(103,232,201,0.18),transparent_30%),radial-gradient(circle_at_bottom_left,rgba(15,163,161,0.13),transparent_32%),#071516]"
     >
       <div className="relative">

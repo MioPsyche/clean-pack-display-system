@@ -8,7 +8,6 @@ export function PainPointSection() {
       id="background"
       eyebrow="Problem"
       title="从叶菜采后处理痛点出发"
-      description="本项目面向比赛展示和样机验证，不夸大商业化指标，重点表达流程连续化、洁净化和小型场景适配价值。"
     >
       <div className="grid gap-4 md:grid-cols-3 lg:gap-5">
         {painPoints.map((point, index) => (

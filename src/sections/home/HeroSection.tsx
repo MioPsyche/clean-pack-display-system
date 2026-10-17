@@ -1,11 +1,11 @@
 import { APP_VERSION, projectProfile } from '../../data/projectProfile';
 import { Badge } from '../../components/ui/Badge';
 import { buttonStyles } from '../../components/ui/Button';
+import { HeroCarousel } from '../../components/ui/HeroCarousel';
+import { heroCopy } from '../../data/homeMedia';
 
 const heroStats = [
   { label: '系统版本', value: APP_VERSION },
-  { label: '参数状态', value: '待实测' },
-  { label: '数据模式', value: '本地后端演示' },
 ];
 
 export function HeroSection() {
@@ -22,20 +22,20 @@ export function HeroSection() {
 
       <div className="relative mx-auto grid max-w-[1400px] items-center gap-14 lg:grid-cols-[0.88fr_1.12fr]">
         <div className="max-w-3xl">
-          <Badge className="bg-white/[0.7]">Engineering Showcase</Badge>
+          <Badge className="max-w-full bg-white/[0.7] normal-case tracking-[0.04em] leading-5">{heroCopy.englishName}</Badge>
           <h1 className="mt-6 max-w-4xl break-words font-display text-[2.55rem] font-semibold leading-[1.03] tracking-[-0.06em] text-carbon text-balance sm:text-6xl lg:text-7xl">
             {projectProfile.shortName}
           </h1>
           <p className="mt-6 max-w-2xl break-words text-base leading-8 text-graphite/82 sm:text-xl">
-            {projectProfile.subtitle}
+            {heroCopy.subtitle}
           </p>
           <p className="mt-5 max-w-2xl break-words text-sm leading-7 text-steel sm:text-base">
-            {projectProfile.description}
+            {heroCopy.description}
           </p>
 
           <div className="mt-9 flex flex-col gap-3 sm:flex-row">
             <a href="#contact" className={buttonStyles({ size: 'lg', className: 'w-full px-8 sm:w-auto' })}>
-              预约项目演示
+              项目演示
             </a>
             <a
               href="#structure"
@@ -45,7 +45,7 @@ export function HeroSection() {
             </a>
           </div>
 
-          <div className="mt-10 grid gap-3 sm:grid-cols-3 lg:max-w-2xl">
+          <div className="mt-10 grid max-w-[13rem] gap-3">
             {heroStats.map((stat) => (
               <div
                 key={stat.label}
@@ -66,30 +66,11 @@ export function HeroSection() {
           <div className="absolute -inset-4 rounded-[3rem] bg-[conic-gradient(from_160deg,rgba(103,232,201,0.34),rgba(15,163,161,0.08),rgba(255,255,255,0.18),rgba(103,232,201,0.34))] blur-2xl sm:-inset-5" />
           <div className="absolute -right-6 top-12 hidden h-28 w-28 rounded-full border border-aqua/25 bg-white/[0.54] backdrop-blur-xl lg:block" />
           <div className="relative overflow-hidden rounded-[2rem] border border-white/80 bg-[linear-gradient(135deg,#071516,#0B2730)] p-2.5 shadow-glow ring-1 ring-aqua/20 sm:rounded-[2.75rem] sm:p-3">
-            <div className="pointer-events-none absolute inset-2.5 z-10 rounded-[1.55rem] ring-1 ring-white/35 sm:inset-3 sm:rounded-[2.25rem]" />
-            <div className="absolute left-4 top-4 z-20 rounded-full border border-white/60 bg-white/[0.88] px-3 py-2 text-[0.62rem] font-bold uppercase tracking-[0.18em] text-carbon shadow-panel-soft backdrop-blur sm:left-6 sm:top-6 sm:px-4 sm:text-xs">
-              Prototype Display
-            </div>
-            <img
-              src="/images/hero-machine.webp"
-              alt="智能叶菜洁净化包装设备主视觉图"
-              width="1536"
-              height="1024"
-              fetchPriority="high"
-              className="aspect-[4/3] w-full rounded-[1.55rem] bg-white object-contain p-2 sm:aspect-[3/2] sm:rounded-[2.25rem] sm:p-4"
-              onError={(event) => {
-                event.currentTarget.onerror = null;
-                event.currentTarget.src = '/images/hero-device-placeholder.svg';
-              }}
-            />
-            <div className="absolute bottom-6 right-6 z-20 hidden rounded-3xl border border-white/55 bg-white/[0.88] p-4 shadow-panel backdrop-blur-xl sm:block">
-              <p className="text-xs font-bold uppercase tracking-[0.2em] text-aqua">Local Demo</p>
-              <p className="mt-1 text-sm font-semibold text-carbon">本地后端 + localStorage 回退</p>
-            </div>
+            <HeroCarousel />
           </div>
-          <div className="relative -mt-7 ml-3 mr-3 rounded-3xl border border-white/70 bg-white/[0.92] p-4 shadow-panel backdrop-blur-xl sm:absolute sm:-bottom-7 sm:left-8 sm:right-8 sm:ml-0 sm:mr-0 sm:p-5">
+          <div className="relative mx-3 mt-4 rounded-3xl border border-white/70 bg-white/[0.92] p-4 shadow-panel backdrop-blur-xl sm:mx-8 sm:p-5">
             <p className="text-sm font-semibold text-carbon">项目定位</p>
-            <p className="mt-1 text-sm leading-6 text-steel">{projectProfile.positioning}</p>
+            <p className="mt-1 text-sm leading-6 text-steel">{heroCopy.positioning}</p>
           </div>
         </div>
       </div>
